@@ -18,6 +18,9 @@ public class Main {
 		ETAPE 3 : on envoi en ligne ses modifications
 		$git push origin master
 
+		user : mathieuHa
+		mdp  : prénom Copine
+
 		**********************************/
 		System.out.println("initial commit");
 		System.out.println("Deuxième commit");
