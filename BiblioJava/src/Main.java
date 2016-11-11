@@ -11,7 +11,7 @@ public class Main {
 
 		ETAPE 1 : on récupère les modifs des autres (OBLIGATOIRE)
 		$git pull origin master
- 
+   
 		ETAPE 2 : on fait ses modifs on les tests 
 		$git commit -a -m "les modifications que j'ai fait" <- le message est important genre ajout class
 		
