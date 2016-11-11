@@ -12,18 +12,18 @@ public class Main {
 		ETAPE 1 : on récupère les modifs des autres (OBLIGATOIRE)
 		$git pull origin master
 
-		ETAPE 2 : on fait ses modifs on les tests
+		ETAPE 2 : on fait ses modifs on les tests 
 		$git commit -a -m "les modifications que j'ai fait" <- le message est important genre ajout class
 		
 		ETAPE 3 : on envoi en ligne ses modifications
 		$git push origin master
 
-		user : mathieuHa
-		mdp  : prénom Copine
+		user : user github
+		mdp  : mdp github
 
 		**********************************/
-		System.out.println("initial commit");
-		System.out.println("Deuxième commit");
+		
+		
 	}
 
 }

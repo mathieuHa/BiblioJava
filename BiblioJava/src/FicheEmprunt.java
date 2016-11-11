@@ -11,7 +11,7 @@ public class FicheEmprunt
 		this.dateLimite 	= dateLimite;
 		this.dateRappel		= dateRappel;
 		this.depasse		= false;
-		this.tarif 			= audio.getTarif();
+		//this.tarif 			= audio.getTarif();
 	}
 	public FicheEmprunt(int dateEmprunt, int dateLimite, int dateRappel, Video video)
 	{
@@ -19,7 +19,7 @@ public class FicheEmprunt
 		this.dateLimite 	= dateLimite;
 		this.dateRappel		= dateRappel;
 		this.depasse		= false;
-		this.tarif 			= video.getTarif();
+		//this.tarif 			= video.getTarif();
 	}
 	public FicheEmprunt(int dateEmprunt, int dateLimite, int dateRappel, Livre livre)
 	{
@@ -27,6 +27,6 @@ public class FicheEmprunt
 		this.dateLimite 	= dateLimite;
 		this.dateRappel		= dateRappel;
 		this.depasse		= false;
-		this.tarif 			= livre.getTarif();
+		//this.tarif 			= livre.getTarif();
 	}
 }
