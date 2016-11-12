@@ -29,8 +29,6 @@ public class Autentification implements ActionListener{
 	private JButton boutoninscription;
 	private JPanel panelpaswd;
 	private JPanel panelname;
-	private ResultSet result;
-	private JOptionPane jop;
 	private Statement stmt = null;
 	private User user;
 	private Boolean ok = false;
@@ -42,7 +40,7 @@ public class Autentification implements ActionListener{
 		frame.pack();
 		frame.setLayout(new GridLayout(3, 1));
 		
-		jop = new JOptionPane();
+		new JOptionPane();
 		user = new User();
 	    
 		panelname = new JPanel();
@@ -132,6 +130,7 @@ public class Autentification implements ActionListener{
 						        	 user.setLogin(fieldlogin.getText());
 						        	 user.setPassword(fieldpassword.getText());
 						        	 ok = true;
+						        	 frame.dispose();
 						         }
 						         else{
 						        	 JOptionPane.showMessageDialog(null, "wrong password", "Attention", JOptionPane.WARNING_MESSAGE);
