@@ -7,15 +7,18 @@ public class Document
 	private boolean emprunte;
 	private boolean empruntable;
 	private int nbEmprunt;
+	private int nbExemplaire;
 	
-	public Document(String code, String titre, String auteur, int annee)
+	public Document(String titre, String auteur, int annee, int nbExemplaire)
 	{
-		this.setCode(code);
+		this.setCode("a trouver");
 		this.setTitre(titre); 
 		this.setAuteur(auteur);
 		this.setAnnee(annee);
 		this.setEmprunte(false);
+		this.setEmpruntable(true);
 		this.setNbEmprunt(0);
+		this.setNbExemplaire(nbExemplaire);
 	}
 
 	public String getCode() {
@@ -72,5 +75,13 @@ public class Document
 
 	public void setEmpruntable(boolean empruntable) {
 		this.empruntable = empruntable;
+	}
+
+	public int getNbExemplaire() {
+		return nbExemplaire;
+	}
+
+	public void setNbExemplaire(int nbExemplaire) {
+		this.nbExemplaire = nbExemplaire;
 	}
 }

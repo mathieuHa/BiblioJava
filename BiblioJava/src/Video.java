@@ -5,12 +5,12 @@ public class Video
 	private int dureeEmprunt;
 	private double tarif;
 
-	public Video(int dureeFilm,	String mentionLegale, int duree, double tarif)
+	public Video(int dureeFilm,	String mentionLegale)
 	{
 		this.setDureeFilm(dureeFilm);
 		this.setMentionLegale(mentionLegale);
-		this.setDureeEmprunt(duree);
-		this.setTarif(tarif);
+		this.setDureeEmprunt(7);
+		this.setTarif(0.5);
 	}
 	
 	public Video () {
