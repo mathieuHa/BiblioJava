@@ -86,6 +86,7 @@ public class Autentification implements ActionListener{
 		frame.add(panelpaswd);
 		frame.add(panelbouton);
 		frame.setVisible(true);
+		afficheBDDVideo();
 	}
 
 	public User getUser() {
@@ -205,6 +206,110 @@ public class Autentification implements ActionListener{
 		    } catch ( Exception e ) {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		      System.exit(0);
+		}
+	}
+	
+	public void afficheBDDAudio () {
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully");
+		      stmt = connexion.createStatement();
+		      ResultSet rs = stmt.executeQuery( "SELECT * FROM AUDIO;" );
+		      while ( rs.next() ) {
+		         int id = rs.getInt("id");
+		         afficheEntry("code",rs);
+		         afficheEntry("titre",rs);
+		         afficheEntry("auteur",rs);
+		         afficheEntry("annee",rs);
+		         afficheEntry("emprunte",rs);
+		         afficheEntry("empruntable",rs);
+		         afficheEntry("nbemprunt",rs);
+		         afficheEntry("nbexemplaire",rs);
+		         afficheEntry("dureeemprunt",rs);
+		         afficheEntry("tarif",rs);
+		         System.out.println();
+		      }
+		      rs.close();
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		}
+	}
+	
+	public void afficheBDDVideo () {
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully");
+		      stmt = connexion.createStatement();
+		      ResultSet rs = stmt.executeQuery( "SELECT * FROM VIDEO;" );
+		      while ( rs.next() ) {
+		         int id = rs.getInt("id");
+		         afficheEntry("code",rs);
+		         afficheEntry("titre",rs);
+		         afficheEntry("auteur",rs);
+		         afficheEntry("annee",rs);
+		         afficheEntry("emprunte",rs);
+		         afficheEntry("empruntable",rs);
+		         afficheEntry("nbemprunt",rs);
+		         afficheEntry("nbexemplaire",rs);
+		         afficheEntry("dureeemprunt",rs);
+		         afficheEntry("tarif",rs);
+		         afficheEntry("dureefilm",rs);
+		         afficheEntry("mentionlegale",rs);
+		         System.out.println();
+		      }
+		      rs.close();
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		}
+	}
+	
+	public void afficheBDDLivre () {
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully");
+		      stmt = connexion.createStatement();
+		      ResultSet rs = stmt.executeQuery( "SELECT * FROM LIVRE;" );
+		      while ( rs.next() ) {
+		         int id = rs.getInt("id");
+		         afficheEntry("code",rs);
+		         afficheEntry("titre",rs);
+		         afficheEntry("auteur",rs);
+		         afficheEntry("annee",rs);
+		         afficheEntry("emprunte",rs);
+		         afficheEntry("empruntable",rs);
+		         afficheEntry("nbemprunt",rs);
+		         afficheEntry("nbexemplaire",rs);
+		         afficheEntry("dureeemprunt",rs);
+		         afficheEntry("tarif",rs);
+		         afficheEntry("nbpage",rs);
+		         System.out.println();
+		      }
+		      rs.close();
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		}
+	}
+	
+	public void afficheEntry(String str, ResultSet rs){
+		try {
+			String  s = rs.getString(str);
+			System.out.println(str.toUpperCase() + " = " + s);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			
+			e.printStackTrace();
 		}
 	}
 

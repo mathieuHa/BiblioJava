@@ -1,20 +1,17 @@
-public class Video
+public class Video extends Document
 {
+	
 	private String mentionLegale;
 	private int dureeFilm;
 	private int dureeEmprunt;
-	private double tarif;
-
-	public Video(int dureeFilm,	String mentionLegale)
-	{
-		this.setDureeFilm(dureeFilm);
-		this.setMentionLegale(mentionLegale);
-		this.setDureeEmprunt(7);
-		this.setTarif(0.5);
-	}
+	private int tarif;
 	
-	public Video () {
-		
+	public Video(Document doc, int dureeFilm, String mentionLegale) {
+		super(doc);
+		this.mentionLegale = mentionLegale;
+		this.dureeFilm = dureeFilm;
+		this.dureeEmprunt = 7;
+		this.tarif = 1;
 	}
 
 	public String getMentionLegale() {
@@ -41,11 +38,11 @@ public class Video
 		this.dureeEmprunt = dureeEmprunt;
 	}
 
-	public double getTarif() {
+	public int getTarif() {
 		return tarif;
 	}
 
-	public void setTarif(double tarif) {
+	public void setTarif(int tarif) {
 		this.tarif = tarif;
 	}
 }

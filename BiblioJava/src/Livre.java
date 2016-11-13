@@ -1,14 +1,22 @@
-public class Livre
+public class Livre extends Document
 {
 	private int nbPage;
 	private int dureeEmprunt;
-	private double tarif;
-
-	public Livre(int nbPage, int duree, double tarif){
-		this.nbPage = nbPage;
-		this.setDureeEmprunt(duree);
-		this.tarif = tarif;
+	private int tarif;
+	
+	public Livre(String titre, String auteur, int annee, int nbExemplaire) {
+		super(titre, auteur, annee, nbExemplaire);
+		// TODO Auto-generated constructor stub
 	}
+	
+	public Livre(Document doc, int nbPage) {
+		super(doc);
+		this.nbPage = nbPage;
+		this.setDureeEmprunt(7);
+		this.tarif = 1;
+		// TODO Auto-generated constructor stub
+	}
+
 
 	public int getNbPage() {
 		return nbPage;
@@ -22,7 +30,7 @@ public class Livre
 		return tarif;
 	}
 
-	public void setTarif(double tarif) {
+	public void setTarif(int tarif) {
 		this.tarif = tarif;
 	}
 

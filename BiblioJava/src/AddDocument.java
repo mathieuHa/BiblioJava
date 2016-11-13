@@ -2,16 +2,21 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
-public class AddDocument extends JFrame {
+public class AddDocument extends JFrame implements ActionListener{
+	Document newDoc;
 	private JPanel panel;
 	private JPanel panelAdd;
 	private JPanel panelAddTitre;
@@ -26,18 +31,14 @@ public class AddDocument extends JFrame {
 	private JTextField fieldAuteur;
 	private JTextField fieldAnnee;
 	private JTextField fieldNbExemplaire;
-	private JPanel panelAddTitreL;
-	private JPanel panelAddAuteurL;
-	private JPanel panelAddAnneeL;
-	private JPanel panelAddNbExemplaireL;
-	private JPanel panelAddTitreF;
-	private JPanel panelAddAuteurF;
-	private JPanel panelAddAnneeF;
-	private JPanel panelAddNbExemplaireF;
-
+	private JPanel contentPane;
+	protected JButton boutonvalider;
+	protected boolean docIsOK;
 	public AddDocument(String title) {
+		docIsOK = false;
 		this.setTitle("Add " + title);
 		this.setMinimumSize(new Dimension(450,600));
+		boutonvalider = new JButton("Valider");
 		panel = new JPanel ();
 		panel.setLayout(new GridLayout(2,1));
 		panelAdd = new JPanel();
@@ -96,18 +97,50 @@ public class AddDocument extends JFrame {
 		
 		
 		panelAdd.add(panelAddTitre);
-		//panelAdd.add(panelAddTitreF);
 		panelAdd.add(panelAddAuteur);
-		//panelAdd.add(panelAddAuteurF);
 		panelAdd.add(panelAddAnnee);
-		//panelAdd.add(panelAddAnneeF);
 		panelAdd.add(panelAddNbExemplaire);
-		//panelAdd.add(panelAddNbExemplaireF);
+		
 		
 		panel.add(panelAdd);
 		
+		//boutonvalider.addActionListener(this);
+		
 		this.setContentPane(panel);
 		this.setVisible(true);
+	}
+	
+	protected void ajouterValiderB (JPanel pane){
+		JPanel panelB = new JPanel ();
+		panelB.setLayout(new BoxLayout(panelB,BoxLayout.X_AXIS));
+		panelB.add(Box.createHorizontalGlue());
+		panelB.add(boutonvalider);
+		panelB.add(Box.createHorizontalGlue());
+		pane.add(panelB);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) { // formatter integer only autorisé a faire
+		// TODO Auto-generated method stub
+		if (arg0.getSource() == boutonvalider) {
+			if (fieldTitre.getText().isEmpty()){
+				JOptionPane.showMessageDialog(null, "Titre empty", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			else if (fieldAuteur.getText().isEmpty()){
+				JOptionPane.showMessageDialog(null, "Auteur empty", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			else if (fieldAnnee.getText().isEmpty()){
+				JOptionPane.showMessageDialog(null, "Annee empty", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			else if (fieldNbExemplaire.getText().isEmpty()){
+				JOptionPane.showMessageDialog(null, "Nb Exemplaire empty", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			else {
+				newDoc = new Document (fieldTitre.getText(),fieldAuteur.getText(),Integer.parseInt(fieldAnnee.getText()),Integer.parseInt(fieldNbExemplaire.getText()));
+				System.out.println("ok doc");
+				docIsOK = true;
+			}
+		}
 	}
 	
 	

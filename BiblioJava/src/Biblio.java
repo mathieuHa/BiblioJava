@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -14,7 +16,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -58,11 +63,12 @@ public class Biblio implements ActionListener{
 	private JButton boutonCompteAddVideo;
 	private JPanel panelAddmin;
 	private AddDocument add;
+	private JTextArea textAreaResult;
 	
 	public Biblio () {
 		
 	    connection ();
-	    
+	    create_table();
 		System.out.println("OK");
 	}
 
@@ -115,12 +121,56 @@ public class Biblio implements ActionListener{
 	      connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
 	      System.out.println("Opened database successfully");
 	      stmt = connexion.createStatement();
-	      String sql = "CREATE TABLE LOGIN " +
+	      String sqllogin = "CREATE TABLE LOGIN " +
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
                   " USERNAME           TEXT    NOT NULL, " + 
                   " PASSWORD           TEXT    NOT NULL)";
+	      String sqlvideo = "CREATE TABLE VIDEO " +
+                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+                  " CODE               TEXT    NOT NULL, " + 
+                  " TITRE              TEXT    NOT NULL, " +
+                  " AUTEUR             TEXT    NOT NULL, " +
+                  " ANNEE              INT     NOT NULL, " +
+                  " EMPRUNTABLE        TINYINT NOT NULL, " +
+                  " EMPRUNTE           TINYINT NOT NULL, " +
+                  " NBEMPRUNT          INT     NOT NULL, " +
+                  " NBEXEMPLAIRE       INT     NOT NULL, " +
+                  " MENTIONLEGALE      TEXT    NOT NULL, " +
+                  " DUREEFILM          INT     NOT NULL, " +
+                  " DUREEEMPRUNT       INT     NOT NULL, " +
+                  " TARIF		       INT     NOT NULL) ";
 	      
-	      //stmt.executeUpdate(sql);
+	      String sqlaudio = "CREATE TABLE AUDIO " +
+                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+                  " CODE               TEXT    NOT NULL, " + 
+                  " TITRE              TEXT    NOT NULL, " +
+                  " AUTEUR             TEXT    NOT NULL, " +
+                  " ANNEE              INT     NOT NULL, " +
+                  " EMPRUNTABLE        TINYINT NOT NULL, " +
+                  " EMPRUNTE           TINYINT NOT NULL, " +
+                  " NBEMPRUNT          INT     NOT NULL, " +
+                  " NBEXEMPLAIRE       INT     NOT NULL, " +
+                  " DUREEEMPRUNT       INT     NOT NULL, " +
+                  " TARIF		       INT     NOT NULL) ";
+	      
+	      String sqllivre = "CREATE TABLE LIVRE " +
+                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+                  " CODE               TEXT    NOT NULL, " + 
+                  " TITRE              TEXT    NOT NULL, " +
+                  " AUTEUR             TEXT    NOT NULL, " +
+                  " ANNEE              INT     NOT NULL, " +
+                  " EMPRUNTABLE        TINYINT NOT NULL, " +
+                  " EMPRUNTE           TINYINT NOT NULL, " +
+                  " NBEMPRUNT          INT     NOT NULL, " +
+                  " NBEXEMPLAIRE       INT     NOT NULL, " +
+                  " NBPAGE             INT     NOT NULL, " +
+                  " DUREEEMPRUNT       INT     NOT NULL, " +
+                  " TARIF		       INT     NOT NULL) ";
+	      
+	      //stmt.executeUpdate(sqllogin);
+	      //stmt.executeUpdate(sqlvideo);
+	      //stmt.executeUpdate(sqlaudio);
+	      //stmt.executeUpdate(sqllivre);
 	      stmt.close();
 	      connexion.close();
 	      
@@ -146,7 +196,10 @@ public class Biblio implements ActionListener{
 		panelbouton.setBackground(Color.gray);	
 		panelAddmin = new JPanel ();
 		panelAddmin.setBackground(Color.darkGray);	
-		 
+		
+		textAreaResult = new JTextArea();
+		JScrollPane scroll = new JScrollPane(textAreaResult);
+		
 		panelfilms = new JPanel();
 		panelfilmsSearch = new JPanel();
 	    panelfilms.setBackground(Color.pink);	
@@ -226,6 +279,8 @@ public class Biblio implements ActionListener{
 	    panelfilms.add(panelfilmsSearch,BorderLayout.NORTH);
 	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
 	    
+	    panelfilms.add(scroll);
+	    
 	    panelbouton.add(boutonCompte);
 	    panelbouton.add(boutonMusique);
 	    panelbouton.add(boutonLivre);
@@ -272,5 +327,39 @@ public class Biblio implements ActionListener{
 			System.out.println("add livre");
 			add = new AddLivre ();
 		}
-	} 
+		else if (arg0.getSource() == boutonOKVideo){
+			System.out.println("recherche video");
+			String sqlsearch = "SELECT * FROM VIDEO where TITRE='" + jtfFilm.getText() + "'";
+			
+			try {
+			      Class.forName("org.sqlite.JDBC");
+			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+			      System.out.println("Opened database successfully");
+			      Statement stmt = connexion.createStatement();
+			      ResultSet rs = stmt.executeQuery(sqlsearch);
+			      while ( rs.next() ) {
+			    	  textAreaResult.add(returnEntry("code",rs));
+				         
+				      }
+			  
+			      stmt.close();
+			      connexion.close();
+			    } catch ( Exception e ) {
+			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			      System.exit(0);
+			    }
+			}
+		}
+	
+	public String returnEntry(String str, ResultSet rs){
+		try {
+			String  s = rs.getString(str);
+			return str.toUpperCase() + " = " + s;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

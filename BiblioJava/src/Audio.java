@@ -1,12 +1,20 @@
-public class Audio {
+public class Audio extends Document{
 	private String classification;
 	private int dureeEmprunt;
-	private double tarif;
+	private int tarif;
 
-	public Audio(String classification, int duree, double tarif){
-		this.classification = classification;
-		this.setDureeEmprunt(duree);
-		this.setTarif(tarif);
+	public Audio(Document doc) {
+		super(doc);
+		this.setDureeEmprunt(7);
+		this.setTarif(1);
+		// TODO Auto-generated constructor stub
+	}
+
+	public Audio(String titre, String auteur, int annee, int nbExemplaire) {
+		super(titre, auteur, annee, nbExemplaire);
+		this.setDureeEmprunt(7);
+		this.setTarif(1);
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getClassification() {
@@ -29,7 +37,7 @@ public class Audio {
 		return tarif;
 	}
 
-	public void setTarif(double tarif) {
+	public void setTarif(int tarif) {
 		this.tarif = tarif;
 	}
 }
