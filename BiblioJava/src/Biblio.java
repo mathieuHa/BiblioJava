@@ -330,7 +330,7 @@ public class Biblio implements ActionListener{
 		else if (arg0.getSource() == boutonOKVideo){
 			System.out.println("recherche video");
 			String sqlsearch = "SELECT * FROM VIDEO where TITRE='" + jtfFilm.getText() + "'";
-			
+			textAreaResult.setText("");
 			try {
 			      Class.forName("org.sqlite.JDBC");
 			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
@@ -338,7 +338,11 @@ public class Biblio implements ActionListener{
 			      Statement stmt = connexion.createStatement();
 			      ResultSet rs = stmt.executeQuery(sqlsearch);
 			      while ( rs.next() ) {
-			    	  textAreaResult.add(returnEntry("code",rs));
+			    	  textAreaResult.append(returnEntry("code",rs) + " ");
+			    	  textAreaResult.append(returnEntry("titre",rs)+ " ");
+			    	  textAreaResult.append(returnEntry("auteur",rs)+ " ");
+			    	  textAreaResult.append(returnEntry("annee",rs)+ " \n");
+			    	  
 				         
 				      }
 			  
