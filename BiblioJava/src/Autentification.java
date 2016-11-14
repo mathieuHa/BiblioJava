@@ -87,6 +87,8 @@ public class Autentification implements ActionListener{
 		frame.add(panelbouton);
 		frame.setVisible(true);
 		afficheBDDVideo();
+		afficheBDDAudio();
+		afficheBDDLivre();
 	}
 
 	public User getUser() {

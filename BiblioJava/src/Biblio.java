@@ -1,9 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,8 +15,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -64,10 +70,23 @@ public class Biblio implements ActionListener{
 	private JPanel panelAddmin;
 	private AddDocument add;
 	private JTextArea textAreaResult;
+	private int nbResult;
+	private ArrayList<JButton> lButton;
+	private ArrayList<Integer> lInteger;
+	private JTextArea textAreaResultMusique;
+	private JScrollPane scrollMusique;
+	private JTextArea textAreaResultAudio;
+	private JScrollPane scrollAudio;
+	private JScrollPane scrollLivre;
+	private JTextArea textAreaResultLivre;
+	private JTextArea textAreaResultFilm;
+	private JScrollPane scrollFilm;
 	
 	public Biblio () {
 		
 	    connection ();
+	    lButton = new ArrayList<JButton>();
+	    lInteger = new ArrayList<Integer>();
 	    create_table();
 		System.out.println("OK");
 	}
@@ -197,8 +216,12 @@ public class Biblio implements ActionListener{
 		panelAddmin = new JPanel ();
 		panelAddmin.setBackground(Color.darkGray);	
 		
-		textAreaResult = new JTextArea();
-		JScrollPane scroll = new JScrollPane(textAreaResult);
+		textAreaResultMusique = new JTextArea();
+		scrollMusique = new JScrollPane(textAreaResultMusique);
+		textAreaResultFilm = new JTextArea();
+		scrollFilm = new JScrollPane(textAreaResultFilm);
+		textAreaResultLivre = new JTextArea();
+		scrollLivre = new JScrollPane(textAreaResultLivre);
 		
 		panelfilms = new JPanel();
 		panelfilmsSearch = new JPanel();
@@ -279,7 +302,9 @@ public class Biblio implements ActionListener{
 	    panelfilms.add(panelfilmsSearch,BorderLayout.NORTH);
 	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
 	    
-	    panelfilms.add(scroll);
+	    panelfilms.add(scrollFilm);
+	    panelmusique.add(scrollMusique);
+	    panellivre.add(scrollLivre);
 	    
 	    panelbouton.add(boutonCompte);
 	    panelbouton.add(boutonMusique);
@@ -299,6 +324,20 @@ public class Biblio implements ActionListener{
 		
 		frame.setVisible(true);
 	}
+	
+	JLabel addImage (String path){
+		BufferedImage myPicture;
+		try {
+			myPicture = ImageIO.read(new File("img/"));
+			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+			return picLabel;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
@@ -329,23 +368,23 @@ public class Biblio implements ActionListener{
 		}
 		else if (arg0.getSource() == boutonOKVideo){
 			System.out.println("recherche video");
-			String sqlsearch = "SELECT * FROM VIDEO where TITRE='" + jtfFilm.getText() + "'";
-			textAreaResult.setText("");
+			String sqlsearch = "SELECT * FROM VIDEO where TITRE LIKE '" +"%"+ jtfFilm.getText() +"%"+ "'";
+			textAreaResultFilm.setText("");
 			try {
 			      Class.forName("org.sqlite.JDBC");
 			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database successfully");
+			      System.out.println("Opened database Video successfully");
 			      Statement stmt = connexion.createStatement();
 			      ResultSet rs = stmt.executeQuery(sqlsearch);
+			      nbResult = 0;
 			      while ( rs.next() ) {
-			    	  textAreaResult.append(returnEntry("code",rs) + " ");
-			    	  textAreaResult.append(returnEntry("titre",rs)+ " ");
-			    	  textAreaResult.append(returnEntry("auteur",rs)+ " ");
-			    	  textAreaResult.append(returnEntry("annee",rs)+ " \n");
-			    	  
-				         
+			    	  textAreaResultFilm.append(returnEntry("code",rs) + " ");
+			    	  textAreaResultFilm.append(returnEntry("titre",rs)+ " ");
+			    	  textAreaResultFilm.append(returnEntry("auteur",rs)+ " ");
+			    	  textAreaResultFilm.append(returnEntry("annee",rs)+ " \n");
+			    	  nbResult++;
 				      }
-			  
+			      
 			      stmt.close();
 			      connexion.close();
 			    } catch ( Exception e ) {
@@ -353,7 +392,78 @@ public class Biblio implements ActionListener{
 			      System.exit(0);
 			    }
 			}
+	else if (arg0.getSource() == boutonOKMusique){
+		System.out.println("recherche musique" + jtfMusique.getText());
+		String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
+		textAreaResultMusique.setText("");
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database Musique successfully");
+		      Statement stmt = connexion.createStatement();
+		      ResultSet rs = stmt.executeQuery(sqlsearch);
+		      nbResult = 0;
+		      lButton.clear();
+		      lInteger.clear();
+		      System.out.println("OK111");
+		      while ( rs.next() ) {
+		    	  JButton jtemp = new JButton();
+		    	  jtemp.addActionListener(this);
+		    	  System.out.println("OK113");
+		    	  textAreaResultMusique.append(returnEntry("code",rs) + " ");
+		    	  textAreaResultMusique.append(returnEntry("titre",rs)+ " ");
+		    	  textAreaResultMusique.append(returnEntry("auteur",rs)+ " ");
+		    	  textAreaResultMusique.append(returnEntry("annee",rs)+ " \n");
+		    	  System.out.println("OK114");
+		    	  lInteger.add(new Integer(Integer.parseInt(rs.getString("ID"))));
+		    	  System.out.println("OK115");
+		    	  lButton.add(jtemp);
+		    	  panelmusique.add(jtemp,BorderLayout.EAST);
+		    	  nbResult++;
+			      }
+		      System.out.println("OK111");
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		    }
 		}
+	else if (arg0.getSource() == boutonOKLivre){
+		System.out.println("recherche livre");
+		String sqlsearch = "SELECT * FROM LIVRE where TITRE='" + jtfLivre.getText() + "'";
+		textAreaResultLivre.setText("");
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database Livre successfully");
+		      Statement stmt = connexion.createStatement();
+		      ResultSet rs = stmt.executeQuery(sqlsearch);
+		      nbResult = 0;
+		      while ( rs.next() ) {
+		    	  textAreaResultLivre.append(returnEntry("code",rs) + " ");
+		    	  textAreaResultLivre.append(returnEntry("titre",rs)+ " ");
+		    	  textAreaResultLivre.append(returnEntry("auteur",rs)+ " ");
+		    	  textAreaResultLivre.append(returnEntry("annee",rs)+ " \n");
+		    	  nbResult++;
+			      }
+		  
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		    }
+		}
+		else if (!lButton.isEmpty()){
+			for (JButton jb : lButton){
+				if (jb == arg0.getSource()){
+					System.out.println("OJ");
+				}
+			}
+		}
+		
+	}
 	
 	public String returnEntry(String str, ResultSet rs){
 		try {

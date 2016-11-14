@@ -3,6 +3,10 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,6 +22,7 @@ public class AddLivre extends AddDocument implements ActionListener{
 	private JPanel panelAddNbPages;
 	private JLabel labelNbPages;
 	private JTextField fieldNbPages;
+	private Livre newLivre;
 
 	public AddLivre() {
 		super("Livre");
@@ -57,7 +62,41 @@ public class AddLivre extends AddDocument implements ActionListener{
 			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
 		}
 		else {
-			
+			newLivre = new Livre (newDoc, Integer.parseInt(fieldNbPages.getText()));
+			String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+newLivre.getTitre()+"'";
+			String sqlinsert = "INSERT INTO LIVRE (CODE,TITRE,AUTEUR,ANNEE,EMPRUNTABLE,EMPRUNTE,"
+												+ "NBEMPRUNT,NBEXEMPLAIRE,NBPAGE,DUREEEMPRUNT,TARIF) " +
+	                   "VALUES ('" + newLivre.getCode() + "',"
+	                   		 + "'" + newLivre.getTitre() + "',"
+	                   		 + "'" + newLivre.getAuteur() + "',"
+	                   		 + "'" + newLivre.getAnnee() + "',"
+	                   		 + "'" + newLivre.isEmpruntable() + "',"
+	                   		 + "'" + newLivre.isEmprunte() + "',"
+	                   		 + "'" + newLivre.getNbEmprunt() + "',"
+	                   		 + "'" + newLivre.getNbExemplaire() + "',"
+	                   		 + "'" + newLivre.getNbPage() + "',"
+	                   		 + "'" + newLivre.getDureeEmprunt() + "',"
+	                   		 + "'" + newLivre.getTarif() + "');"; 
+			try {
+			      Class.forName("org.sqlite.JDBC");
+			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+			      System.out.println("Opened database successfully");
+			      Statement stmt = connexion.createStatement();
+			      ResultSet rs = stmt.executeQuery(sqltest);
+			      //System.out.println(rs.getInt("sum"));
+			      if (rs.getInt("sum")!=0){
+			    	  System.out.println("existe deja");
+			    	  JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
+			      } else {
+			    	  stmt.executeUpdate(sqlinsert);
+			    	  System.out.println("ajout");
+			      }
+			      stmt.close();
+			      connexion.close();
+			    } catch ( Exception e ) {
+			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			      System.exit(0);
+			    }
 		}
 	}
 	
