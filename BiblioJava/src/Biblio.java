@@ -3,6 +3,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -16,6 +17,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -81,6 +84,23 @@ public class Biblio implements ActionListener{
 	private JTextArea textAreaResultLivre;
 	private JTextArea textAreaResultFilm;
 	private JScrollPane scrollFilm;
+	private JPanel panelfilmB;
+	private ObjList obj;
+	private JLabel title;
+	private JLabel auteur;
+	private JLabel duree;
+	private JLabel NbE;
+	private JButton buttonVP;
+	private JPanel panelfilmResult;
+	private JPanel panelfilmhelp;
+	private JPanel panelmusiqueResult;
+	private JPanel panellivreResult;
+	private JPanel panellivrehelp;
+	private JPanel panelmusiquehelp;
+	private JButton boutonmusiqueReset;
+	private JButton boutonfilmReset;
+	private JButton boutonlivrehelp;
+	private AbstractButton boutonlivreReset;
 	
 	public Biblio () {
 		
@@ -204,7 +224,7 @@ public class Biblio implements ActionListener{
 	
 	public void afficheLibrairy (){
 		frame = new JFrame ("LibraryGUI");
-		frame.setMinimumSize(new Dimension(800,480));
+		frame.setMinimumSize(new Dimension(850,500));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLayout(new BorderLayout());
@@ -233,6 +253,7 @@ public class Biblio implements ActionListener{
 	    panelcompte.setLayout(new BorderLayout());
 	    panelmusique = new JPanel();
 	    panelmusiqueSearch = new JPanel();
+	    panelfilmsSearch.setBackground(Color.lightGray);
 	    panelmusique.setBackground(Color.red);	
 	    panelmusique.setLayout(new BorderLayout());
 	    panellivre = new JPanel();
@@ -302,9 +323,53 @@ public class Biblio implements ActionListener{
 	    panelfilms.add(panelfilmsSearch,BorderLayout.NORTH);
 	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
 	    
-	    panelfilms.add(scrollFilm);
-	    panelmusique.add(scrollMusique);
-	    panellivre.add(scrollLivre);
+	    panelfilmResult = new JPanel(new GridLayout(6,1));
+	    panelfilmResult.setMaximumSize(new Dimension(600,300));
+	    panelfilmResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    panelmusiqueResult = new JPanel(new GridLayout(6,1));
+	    panelmusiqueResult.setMaximumSize(new Dimension(600,300));
+	    panelmusiqueResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    panellivreResult = new JPanel(new GridLayout(6,1));
+	    panellivreResult.setMaximumSize(new Dimension(600,300));
+	    panellivreResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    obj = new ObjList();
+	    boutonfilmReset = new JButton("ici");
+	    boutonfilmReset.addActionListener(this);
+	    boutonlivreReset = new JButton("ici");
+	    boutonlivreReset.addActionListener(this);
+	    boutonmusiqueReset = new JButton("ici");
+	    boutonmusiqueReset.addActionListener(this);
+	    panelfilmhelp = obj.helpVideo(frame.getWidth()-100,boutonfilmReset); 
+	    panelmusiquehelp = obj.helpMusique(frame.getWidth()-100,boutonmusiqueReset); 
+	    panellivrehelp = obj.helpLivre(frame.getWidth()-100,boutonlivrehelp); 
+	    
+	    
+	    panelfilmResult.add(panelfilmhelp);
+	    panelfilms.add(panelfilmResult,BorderLayout.CENTER);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	    
+	    panelmusiqueResult.add(panelmusiquehelp);
+	    panelmusique.add(panelmusiqueResult,BorderLayout.CENTER);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	    
+	    panellivreResult.add(panellivrehelp);
+	    panellivre.add(panellivreResult,BorderLayout.CENTER);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	    
+	   
+	    
+	    //panelfilms.add(scrollFilm,BorderLayout.CENTER);
+	    //panelmusique.add(scrollMusique);
+	    //panellivre.add(scrollLivre);
 	    
 	    panelbouton.add(boutonCompte);
 	    panelbouton.add(boutonMusique);
@@ -338,6 +403,8 @@ public class Biblio implements ActionListener{
 		return null;
 	}
 	
+	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
@@ -369,7 +436,6 @@ public class Biblio implements ActionListener{
 		else if (arg0.getSource() == boutonOKVideo){
 			System.out.println("recherche video");
 			String sqlsearch = "SELECT * FROM VIDEO where TITRE LIKE '" +"%"+ jtfFilm.getText() +"%"+ "'";
-			textAreaResultFilm.setText("");
 			try {
 			      Class.forName("org.sqlite.JDBC");
 			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
@@ -377,14 +443,11 @@ public class Biblio implements ActionListener{
 			      Statement stmt = connexion.createStatement();
 			      ResultSet rs = stmt.executeQuery(sqlsearch);
 			      nbResult = 0;
+			      clearSearch(panelfilmResult,panelfilmhelp);
 			      while ( rs.next() ) {
-			    	  textAreaResultFilm.append(returnEntry("code",rs) + " ");
-			    	  textAreaResultFilm.append(returnEntry("titre",rs)+ " ");
-			    	  textAreaResultFilm.append(returnEntry("auteur",rs)+ " ");
-			    	  textAreaResultFilm.append(returnEntry("annee",rs)+ " \n");
-			    	  nbResult++;
-				      }
-			      
+			    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getInt("annee"),rs.getInt("dureefilm"),rs.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
+				  }
+			      panelfilmResult.updateUI();
 			      stmt.close();
 			      connexion.close();
 			    } catch ( Exception e ) {
@@ -395,7 +458,6 @@ public class Biblio implements ActionListener{
 	else if (arg0.getSource() == boutonOKMusique){
 		System.out.println("recherche musique" + jtfMusique.getText());
 		String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
-		textAreaResultMusique.setText("");
 		try {
 		      Class.forName("org.sqlite.JDBC");
 		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
@@ -403,25 +465,11 @@ public class Biblio implements ActionListener{
 		      Statement stmt = connexion.createStatement();
 		      ResultSet rs = stmt.executeQuery(sqlsearch);
 		      nbResult = 0;
-		      lButton.clear();
-		      lInteger.clear();
-		      System.out.println("OK111");
+		      clearSearch(panelmusiqueResult,panelmusiquehelp);
 		      while ( rs.next() ) {
-		    	  JButton jtemp = new JButton();
-		    	  jtemp.addActionListener(this);
-		    	  System.out.println("OK113");
-		    	  textAreaResultMusique.append(returnEntry("code",rs) + " ");
-		    	  textAreaResultMusique.append(returnEntry("titre",rs)+ " ");
-		    	  textAreaResultMusique.append(returnEntry("auteur",rs)+ " ");
-		    	  textAreaResultMusique.append(returnEntry("annee",rs)+ " \n");
-		    	  System.out.println("OK114");
-		    	  lInteger.add(new Integer(Integer.parseInt(rs.getString("ID"))));
-		    	  System.out.println("OK115");
-		    	  lButton.add(jtemp);
-		    	  panelmusique.add(jtemp,BorderLayout.EAST);
-		    	  nbResult++;
-			      }
-		      System.out.println("OK111");
+		    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getInt("annee"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
+			  }
+		      panelmusiqueResult.updateUI();
 		      stmt.close();
 		      connexion.close();
 		    } catch ( Exception e ) {
@@ -432,7 +480,6 @@ public class Biblio implements ActionListener{
 	else if (arg0.getSource() == boutonOKLivre){
 		System.out.println("recherche livre");
 		String sqlsearch = "SELECT * FROM LIVRE where TITRE='" + jtfLivre.getText() + "'";
-		textAreaResultLivre.setText("");
 		try {
 		      Class.forName("org.sqlite.JDBC");
 		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
@@ -440,14 +487,11 @@ public class Biblio implements ActionListener{
 		      Statement stmt = connexion.createStatement();
 		      ResultSet rs = stmt.executeQuery(sqlsearch);
 		      nbResult = 0;
+		      clearSearch(panellivreResult,panellivrehelp);
 		      while ( rs.next() ) {
-		    	  textAreaResultLivre.append(returnEntry("code",rs) + " ");
-		    	  textAreaResultLivre.append(returnEntry("titre",rs)+ " ");
-		    	  textAreaResultLivre.append(returnEntry("auteur",rs)+ " ");
-		    	  textAreaResultLivre.append(returnEntry("annee",rs)+ " \n");
-		    	  nbResult++;
-			      }
-		  
+		    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getInt("annee"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
+			  }
+		      panellivreResult.updateUI();
 		      stmt.close();
 		      connexion.close();
 		    } catch ( Exception e ) {
@@ -455,6 +499,21 @@ public class Biblio implements ActionListener{
 		      System.exit(0);
 		    }
 		}
+	else if (boutonfilmReset == arg0.getSource()){
+		System.out.println("bouton reset");
+		clearSearch(panelfilmResult,panelfilmhelp);
+		panelfilmResult.updateUI();
+	}
+	else if (boutonmusiqueReset == arg0.getSource()){
+		System.out.println("bouton reset");
+		clearSearch(panelmusiqueResult,panelmusiquehelp);
+		panelmusiqueResult.updateUI();
+	}
+	else if (boutonlivreReset == arg0.getSource()){
+		System.out.println("bouton reset");
+		clearSearch(panellivreResult,panellivrehelp);
+		panellivreResult.updateUI();
+	}
 		else if (!lButton.isEmpty()){
 			for (JButton jb : lButton){
 				if (jb == arg0.getSource()){
@@ -463,6 +522,12 @@ public class Biblio implements ActionListener{
 			}
 		}
 		
+	}
+	
+	public void clearSearch (JPanel paneR, JPanel paneAdd){
+		System.out.println("reset");
+			paneR.removeAll();
+			paneR.add(paneAdd);
 	}
 	
 	public String returnEntry(String str, ResultSet rs){
@@ -475,5 +540,14 @@ public class Biblio implements ActionListener{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public JPanel panelColor (Color c) {
+		JPanel pane = new JPanel();
+		pane.setLayout(new BoxLayout(pane, nbResult));
+		pane.setBackground(c);
+		pane.add(Box.createHorizontalStrut(30));
+		pane.add(Box.createVerticalStrut(30));
+		return pane;
 	}
 }
