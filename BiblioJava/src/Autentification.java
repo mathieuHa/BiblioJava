@@ -1,24 +1,9 @@
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.border.Border;
+import javax.swing.*;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-public class Autentification implements ActionListener{
+public class Autentification implements ActionListener {
 	private JFrame frame;
 	private JPanel panelbouton;
 	private JTextField fieldlogin;
@@ -33,62 +18,64 @@ public class Autentification implements ActionListener{
 	private User user;
 	private Boolean ok = false;
 	
+
 	public Autentification () {
-		frame = new JFrame ("autentification");
-		frame.setMinimumSize(new Dimension(640,480));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setLayout(new GridLayout(3, 1));
-		
 		new JOptionPane();
 		user = new User();
-	    
-		panelname = new JPanel();
-		panelpaswd = new JPanel();
-		panelbouton = new JPanel();
-		panelbouton.setLayout(new BoxLayout(panelbouton,BoxLayout.X_AXIS));
-		panelname.setLayout(new BoxLayout(panelname,BoxLayout.X_AXIS));
-		panelpaswd.setLayout(new BoxLayout(panelpaswd,BoxLayout.X_AXIS));
-		textlogin = new JLabel    ("username     :");
+
+		line = BorderFactory.createLineBorder(Color.white, 3);
+		frame = new JFrame ("autentification");
+		frame.setMinimumSize(new Dimension(640,350));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		
+		textlogin = new JLabel    ("username       :");
+		textlogin.setOpaque(true);
+		textlogin.setBackground(Color.WHITE);
+		textlogin.setBorder(line);
 		textpassword = new JLabel ("mot de passe :");
+		textpassword.setOpaque(true);
+		textpassword.setBackground(Color.WHITE);
+		textpassword.setBorder(line);
 		fieldlogin = new JTextField();
 		fieldpassword = new JTextField();
+		
 		boutonconnexion = new JButton("connexion");
 		boutoninscription = new JButton("inscription");
-		
-		boutonconnexion.addActionListener(this);
-		boutoninscription.addActionListener(this);
-		
+
+		paneltxt = new JPanel();
+		panelname = new ImagePanel(); 
+		panelpaswd = new JPanel();
+		panelbouton = new JPanel();
+		panelname.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(25,10,10,10);
+
+		c.gridx = 100; c.gridy = 100;
+		panelname.add(textlogin,c);
+		c.gridx = 200; c.gridy = 100;
+		panelname.add(fieldlogin,c);
+		c.gridx = 100; c.gridy = 200;
+		panelname.add(textpassword,c);
+		c.gridx = 200; c.gridy = 200;
+		panelname.add(fieldpassword,c);
 		fieldlogin.setPreferredSize(new Dimension(150, 25));
 		fieldlogin.setMaximumSize(fieldlogin.getPreferredSize());
 		fieldpassword.setPreferredSize(new Dimension(150, 25));
 		fieldpassword.setMaximumSize(fieldpassword.getPreferredSize());
-		
-		panelname.add(Box.createHorizontalGlue());
-		panelname.add(textlogin);
-		panelname.add(Box.createHorizontalStrut(50));
-		panelname.add(fieldlogin);
-		panelname.add(Box.createHorizontalGlue());
-		
-		panelpaswd.add(Box.createHorizontalGlue());
-		panelpaswd.add(textpassword);
-		panelpaswd.add(Box.createHorizontalStrut(50));
-		panelpaswd.add(fieldpassword);
-		panelpaswd.add(Box.createHorizontalGlue());
-		
-		panelbouton.add(Box.createHorizontalGlue());	
-		panelbouton.add(boutonconnexion);
-		panelbouton.add(Box.createHorizontalStrut(30));
-		panelbouton.add(boutoninscription);
-		panelbouton.add(Box.createHorizontalGlue());	
+		c.gridx = 100; c.gridy = 300;
+		panelname.add(boutoninscription,c);
+		c.gridx = 200; c.gridy = 300;
+		panelname.add(boutonconnexion,c);
 		
 		frame.add(panelname);
-		frame.add(panelpaswd);
-		frame.add(panelbouton);
-		frame.setVisible(true);
 		afficheBDDVideo();
 		afficheBDDAudio();
 		afficheBDDLivre();
+
+
+		
+		frame.setVisible(true);
 	}
 
 	public User getUser() {
@@ -322,4 +309,6 @@ public class Autentification implements ActionListener{
 	public void setOk(Boolean ok) {
 		this.ok = ok;
 	}
+}
+
 }
