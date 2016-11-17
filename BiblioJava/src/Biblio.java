@@ -388,6 +388,8 @@ public class Biblio implements ActionListener{
 	    frame.add(panel, BorderLayout.CENTER);
 		
 		frame.setVisible(true);
+
+		// AddJson addd = new AddJson();// faire dans un swing worker ralenti l'UI	
 	}
 	
 	JLabel addImage (String path){
