@@ -1,5 +1,11 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.swing.border.Border;
 import javax.swing.*;
 
@@ -13,18 +19,20 @@ public class Autentification implements ActionListener {
 	private JButton boutonconnexion;
 	private JButton boutoninscription;
 	private JPanel panelpaswd;
-	private JPanel panelname;
+	private ImagePanel panelname;
 	private Statement stmt = null;
 	private User user;
 	private Boolean ok = false;
+	private JPanel paneltxt;
+	private Border line;
 	
 
 	public Autentification () {
 		new JOptionPane();
 		user = new User();
 
-		line = BorderFactory.createLineBorder(Color.white, 3);
-		frame = new JFrame ("autentification");
+		line = BorderFactory.createLineBorder(Color.WHITE, 3);
+		frame = new JFrame ("Autentification");
 		frame.setMinimumSize(new Dimension(640,350));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
@@ -41,7 +49,9 @@ public class Autentification implements ActionListener {
 		fieldpassword = new JTextField();
 		
 		boutonconnexion = new JButton("connexion");
+		boutonconnexion.addActionListener(this);
 		boutoninscription = new JButton("inscription");
+		boutoninscription.addActionListener(this);
 
 		paneltxt = new JPanel();
 		panelname = new ImagePanel(); 
@@ -67,6 +77,7 @@ public class Autentification implements ActionListener {
 		panelname.add(boutoninscription,c);
 		c.gridx = 200; c.gridy = 300;
 		panelname.add(boutonconnexion,c);
+		
 		
 		frame.add(panelname);
 		afficheBDDVideo();
@@ -239,7 +250,7 @@ public class Autentification implements ActionListener {
 		         int id = rs.getInt("id");
 		         afficheEntry("code",rs);
 		         afficheEntry("titre",rs);
-		         afficheEntry("auteur",rs);
+		         //afficheEntry("auteur",rs);
 		         afficheEntry("annee",rs);
 		         afficheEntry("emprunte",rs);
 		         afficheEntry("empruntable",rs);
@@ -247,8 +258,8 @@ public class Autentification implements ActionListener {
 		         afficheEntry("nbexemplaire",rs);
 		         afficheEntry("dureeemprunt",rs);
 		         afficheEntry("tarif",rs);
-		         afficheEntry("dureefilm",rs);
-		         afficheEntry("mentionlegale",rs);
+		         //afficheEntry("dureefilm",rs);
+		         //afficheEntry("mentionlegale",rs);
 		         System.out.println();
 		      }
 		      rs.close();
@@ -279,7 +290,7 @@ public class Autentification implements ActionListener {
 		         afficheEntry("nbexemplaire",rs);
 		         afficheEntry("dureeemprunt",rs);
 		         afficheEntry("tarif",rs);
-		         afficheEntry("nbpage",rs);
+		         //afficheEntry("nbpage",rs);
 		         System.out.println();
 		      }
 		      rs.close();
@@ -311,4 +322,3 @@ public class Autentification implements ActionListener {
 	}
 }
 
-}

@@ -8,6 +8,7 @@ public class ImagePanel extends JPanel
    public ImagePanel()
    {
      image = Toolkit.getDefaultToolkit().getImage("lib.jpg");
+     System.out.println(image); 
     try
     {
       jbInit();
@@ -24,7 +25,7 @@ public class ImagePanel extends JPanel
  
      int imageWight = image.getWidth(this);
      int imageHeight = image.getHeight(this);
- 
+     
      g.drawImage (image, 0, 0, null);
      repaint();
    }

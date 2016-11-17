@@ -26,6 +26,11 @@ public class AddJson {
 	//https://api.themoviedb.org/3/movie/popular?api_key=d53c99e97da849ea55b8ce31fd5e7666&language=en-FR
 	//w92", "w154", "w185", "w342", "w500", "w780
 	//http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg 
+	// bfb2dac1747744eaa4532c62d7606ca0 id spotify
+	// BQAriOrylvVUloW2_n3NbEpWuPZlg6pO oth2
+    
+	//https://api.spotify.com/v1/search?q=ok&type=track&limit=2
+
 	public AddJson (String urlS){
 		URL url = null;
 	    try {
@@ -46,6 +51,11 @@ public class AddJson {
 	
 	public static String buildRequestBook(String subject) {
 		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=40&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
+		return s;
+	}
+	
+	public static String buildRequestMusique(String subject) {
+		String s = "https://api.spotify.com/v1/search?q="+subject+"&type=track&limit=2";
 		return s;
 	}
 	
@@ -222,6 +232,51 @@ public class AddJson {
 		    }
     }
     
+    public static void sendMusic (String title, String auteur, String album, String image, String id){
+    	title = title.replace("'", "''");
+    	album = album.replace("'", "''");
+    	image = image.replace("'", "''");
+    	id = id.replace("'", "''");
+		//String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+title+"'";
+		String sqlinsert = "INSERT INTO AUDIO (CODE,TITRE,AUTEUR,ALBUM,IMAGE,EMPRUNTABLE,EMPRUNTE,"
+											+ "NBEMPRUNT,NBEXEMPLAIRE,DUREEEMPRUNT,TARIF) " +
+                   "VALUES ('" + id + "',"
+                   		 + "'" + title + "',"
+                   		 + "'" + auteur + "',"
+                   		 + "'" + album + "',"
+                   		 + "'" + image + "',"
+                   		 + "'" + 0 + "',"
+                   		 + "'" + 0 + "',"
+                   		 + "'" + 0 + "',"
+                   		 + "'" + 0 + "',"
+                   		 + "'" + 0 + "',"
+                   		 + "'" + 0 + "');"; 
+		System.out.println(sqlinsert);
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully dz");
+		      Statement stmt = connexion.createStatement();
+		      //ResultSet rs = stmt.executeQuery(sqltest);
+		      
+		      //System.out.println(rs.getInt("sum"));
+		      //if (rs.getInt("sum")!=0){
+		    	//  System.out.println("existe deja");
+		    	 // JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
+		      //} else {
+		    	  System.out.println("preajout");
+
+		    	  stmt.executeUpdate(sqlinsert);
+		    	  System.out.println("ajout");
+		      //}
+		      stmt.close();
+		      connexion.close();
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		    }
+    }
+    
     public static void addBook (){
     	AddJson addd = new AddJson(AddJson.buildRequestBook("flower"));// faire dans un swing worker ralenti l'UI	
 		JSONObject js = addd.getObjectJS();
@@ -291,10 +346,45 @@ public class AddJson {
 				title = item.getString("original_title");
 				description = item.getString("overview");
 				date = item.getString("release_date");
-				image = String.valueOf(item.get("backdrop_path"));
+				image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.get("backdrop_path"));
 				note = String.valueOf(item.getDouble("vote_average"));
 				langage = item.getString("original_language");
 				sendFilm(title,description,image,date,id,langage,note);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public static void addMusic (){
+    	AddJson addd = new AddJson(AddJson.buildRequestMusique("1"));// faire dans un swing worker ralenti l'UI	
+		JSONObject js = addd.getObjectJS();
+		
+		
+		String title = "";
+		String album = "";
+		String auteur = "";
+		String image ="";
+		String id ="";
+		
+		try {
+			JSONObject track = js.getJSONObject("tracks");
+			JSONArray Array = track.getJSONArray("items");
+			System.out.println("lenght " + Array.length());
+			for (int i=0; i<Array.length(); i++){
+				JSONObject item = Array.getJSONObject(i);
+				id = String.valueOf(item.getString("id"));
+				title = item.getString("name");
+				JSONObject albumO = item.getJSONObject("album");
+				album = albumO.getString("name");
+				JSONArray imageA = albumO.getJSONArray("images");
+				image = imageA.getJSONObject(1).getString("url");
+				JSONArray artistA = item.getJSONArray("artists");
+				for (int j=0; j<artistA.length(); j++){
+					auteur+=artistA.getJSONObject(j).getString("name")+", ";
+				}
+				sendMusic(title,auteur,album,image,id);
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

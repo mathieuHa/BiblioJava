@@ -103,7 +103,7 @@ public class Biblio implements ActionListener{
 	private JButton boutonlivreReset;
 	
 	public Biblio () {
-		//create_table();
+		create_table();
 	    connection ();
 	    lButton = new ArrayList<JButton>();
 	    lInteger = new ArrayList<Integer>();
@@ -185,7 +185,8 @@ public class Biblio implements ActionListener{
                   " CODE               TEXT    NOT NULL, " + 
                   " TITRE              TEXT    NOT NULL, " +
                   " AUTEUR             TEXT    NOT NULL, " +
-                  " ANNEE              INT     NOT NULL, " +
+                  " ALBUM              TEXT    NOT NULL, " +
+                  " IMAGE              TEXT    NOT NULL, " +
                   " EMPRUNTABLE        TINYINT NOT NULL, " +
                   " EMPRUNTE           TINYINT NOT NULL, " +
                   " NBEMPRUNT          INT     NOT NULL, " +
@@ -227,7 +228,7 @@ public class Biblio implements ActionListener{
 	
 	public void afficheLibrairy (){
 		frame = new JFrame ("LibraryGUI");
-		frame.setMinimumSize(new Dimension(1200,600));
+		frame.setMinimumSize(new Dimension(1200,800));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLayout(new BorderLayout());
@@ -393,7 +394,8 @@ public class Biblio implements ActionListener{
 		frame.setVisible(true);
 
 		AddJson.addVideo();
-		//AddJson.addBook();
+		AddJson.addMusic();
+		AddJson.addBook();
 		
 		//AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY
 	}
@@ -453,7 +455,7 @@ public class Biblio implements ActionListener{
 			      nbResult = 0;
 			      clearSearch(panelfilmResult,panelfilmhelp);
 			      while ( rs.next() && nbResult <5) {
-			    	obj = new ObjList(rs.getString("titre"),rs.getString("description"),rs.getString("annee"),rs.getString("note"),rs.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
+			    	obj = new ObjList(rs.getString("titre"),rs.getString("description"),rs.getString("annee"),rs.getString("note"),rs.getString("image"),rs.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
 			    	nbResult++;
 				  }
 			      panelfilmResult.updateUI();
@@ -475,8 +477,9 @@ public class Biblio implements ActionListener{
 		      ResultSet rs = stmt.executeQuery(sqlsearch);
 		      nbResult = 0;
 		      clearSearch(panelmusiqueResult,panelmusiquehelp);
-		      while ( rs.next() ) {
-		    	 obj = new ObjList(rs.getString("titre"),rs.getString("description"),rs.getString("annee"),rs.getString("annee"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
+		      while ( rs.next() && nbResult<5) {
+		    	  obj = new ObjList(rs.getString("titre"),rs.getString("album"),rs.getString("auteur"),"",rs.getString("image"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
+		    	  nbResult++;
 			  }
 		      panelmusiqueResult.updateUI();
 		      stmt.close();
@@ -498,7 +501,7 @@ public class Biblio implements ActionListener{
 		      nbResult = 0;
 		      clearSearch(panellivreResult,panellivrehelp);
 		      while ( rs.next() && nbResult <5) {
-		    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
+		    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getString("image"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
 		    	nbResult++;
 			  }
 		      panellivreResult.updateUI();
