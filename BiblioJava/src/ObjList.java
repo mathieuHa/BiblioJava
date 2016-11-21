@@ -1,9 +1,13 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageConsumer;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 public class ObjList {
 	private JPanel obj;
@@ -77,6 +82,8 @@ public class ObjList {
 		Pane.add(obj);
 		//System.out.println("ici");
 	}
+	
+
 	public ObjList (String titre, String auteur, String annee, String category,String image, int nbExemplaire, JPanel Pane, int width)
 	{
 		int sizetext = 20;
@@ -87,17 +94,16 @@ public class ObjList {
 		labelannee = (annee.length() > sizetext) ? new JLabel(annee.substring(0, sizetext)+"..") : new JLabel (annee);
 		labelcategory = (category.length() > sizetext) ? new JLabel(category.substring(0, sizetext)+"..") : new JLabel (category);
 		NbE = new JLabel(""+nbExemplaire);
+		labelimage = new JLabel("erreur");
 		try {
-			ImageIcon img = new ImageIcon( new URL(image));
-			labelimage = new JLabel(img);
-			labelimage.setPreferredSize(new Dimension(80,100));
+			labelimage = new JLabel( (Icon) new ImageIcon( new URL(image) ) );
 			labelimage.setMaximumSize(new Dimension(80,100));
+			labelimage.setPreferredSize(labelimage.getMaximumSize());
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			labelimage = new JLabel("erreur");
 			e.printStackTrace();
 		}
-		//labelimage = new JLabel("erreur");
 		buttonVP = new JButton("Voir Plus");
 		obj.add(Box.createHorizontalStrut(25));
 		obj.add(labelimage);
@@ -118,6 +124,14 @@ public class ObjList {
 		System.out.println("ici");
 	}
 	
+	public JButton getButtonVP() {
+		return buttonVP;
+	}
+
+	public void setButtonVP(JButton buttonVP) {
+		this.buttonVP = buttonVP;
+	}
+
 	public JPanel helpVideo(int width, JButton bouton)
 	{
 		obj = new JPanel();

@@ -74,8 +74,12 @@ public class Biblio implements ActionListener{
 	private AddDocument add;
 	private JTextArea textAreaResult;
 	private int nbResult;
-	private ArrayList<JButton> lButton;
-	private ArrayList<Integer> lInteger;
+	private ArrayList<JButton> lButtonV;
+	private ArrayList<Integer> lIntegerV;
+	private ArrayList<JButton> lButtonM;
+	private ArrayList<Integer> lIntegerM;
+	private ArrayList<JButton> lButtonL;
+	private ArrayList<Integer> lIntegerL;
 	private JTextArea textAreaResultMusique;
 	private JScrollPane scrollMusique;
 	private JTextArea textAreaResultAudio;
@@ -105,8 +109,12 @@ public class Biblio implements ActionListener{
 	public Biblio () {
 		//create_table();
 	    connection ();
-	    lButton = new ArrayList<JButton>();
-	    lInteger = new ArrayList<Integer>();
+	    lButtonV = new ArrayList<JButton>();
+	    lIntegerV = new ArrayList<Integer>();
+	    lButtonL = new ArrayList<JButton>();
+	    lIntegerL = new ArrayList<Integer>();
+	    lButtonM = new ArrayList<JButton>();
+	    lIntegerM = new ArrayList<Integer>();
 	    
 		System.out.println("OK");
 	}
@@ -455,8 +463,13 @@ public class Biblio implements ActionListener{
 			      ResultSet rs = stmt.executeQuery(sqlsearch);
 			      nbResult = 0;
 			      clearSearch(panelfilmResult,panelfilmhelp);
+			      lButtonV.clear();
+			      lIntegerV.clear();
 			      while ( rs.next() && nbResult <5) {
 			    	obj = new ObjList(rs.getString("titre"),rs.getString("description"),rs.getString("annee"),rs.getString("note"),rs.getString("image"),rs.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
+			    	lButtonV.add(obj.getButtonVP());
+			    	lIntegerV.add(rs.getInt("id"));
+			    	obj.getButtonVP().addActionListener(this);
 			    	nbResult++;
 				  }
 			      panelfilmResult.updateUI();
@@ -467,74 +480,107 @@ public class Biblio implements ActionListener{
 			      System.exit(0);
 			    }
 			}
-	else if (arg0.getSource() == boutonOKMusique){
-		System.out.println("recherche musique" + jtfMusique.getText());
-		String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
-		try {
-		      Class.forName("org.sqlite.JDBC");
-		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database Musique successfully");
-		      Statement stmt = connexion.createStatement();
-		      ResultSet rs = stmt.executeQuery(sqlsearch);
-		      nbResult = 0;
-		      clearSearch(panelmusiqueResult,panelmusiquehelp);
-		      while ( rs.next() && nbResult<5) {
-		    	  obj = new ObjList(rs.getString("titre"),rs.getString("album"),rs.getString("auteur"),"",rs.getString("image"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
-		    	  nbResult++;
-			  }
-		      panelmusiqueResult.updateUI();
-		      stmt.close();
-		      connexion.close();
-		    } catch ( Exception e ) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
-		    }
+		else if (arg0.getSource() == boutonOKMusique){
+			System.out.println("recherche musique" + jtfMusique.getText());
+			String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
+			try {
+			      Class.forName("org.sqlite.JDBC");
+			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+			      System.out.println("Opened database Musique successfully");
+			      Statement stmt = connexion.createStatement();
+			      ResultSet rs = stmt.executeQuery(sqlsearch);
+			      nbResult = 0;
+			      clearSearch(panelmusiqueResult,panelmusiquehelp);
+			      lButtonM.clear();
+			      lIntegerM.clear();
+			      while ( rs.next() && nbResult<5) {
+			    	  obj = new ObjList(rs.getString("titre"),rs.getString("album"),rs.getString("auteur"),"",rs.getString("image"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
+			    	  lButtonM.add(obj.getButtonVP());
+				      lIntegerM.add(rs.getInt("id"));
+				      obj.getButtonVP().addActionListener(this);
+			    	  nbResult++;
+				  }
+			      panelmusiqueResult.updateUI();
+			      stmt.close();
+			      connexion.close();
+			    } catch ( Exception e ) {
+			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			      System.exit(0);
+			    }
+			}
+		else if (arg0.getSource() == boutonOKLivre){
+			System.out.println("recherche livre");
+			String sqlsearch = "SELECT * FROM LIVRE where TITRE LIKE '" + "%" + jtfLivre.getText() + "%"  + "'";
+			try {
+			      Class.forName("org.sqlite.JDBC");
+			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+			      System.out.println("Opened database Livre successfully");
+			      Statement stmt = connexion.createStatement();
+			      ResultSet rs = stmt.executeQuery(sqlsearch);
+			      nbResult = 0;
+			      clearSearch(panellivreResult,panellivrehelp);
+			      lButtonL.clear();
+			      lIntegerL.clear();
+			      while ( rs.next() && nbResult <5) {
+			    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getString("image"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
+			    	lButtonL.add(obj.getButtonVP());
+			    	lIntegerL.add(rs.getInt("id"));
+			    	obj.getButtonVP().addActionListener(this);
+			    	nbResult++;
+				  }
+			      panellivreResult.updateUI();
+			      stmt.close();
+			      connexion.close();
+			    } catch ( Exception e ) {
+			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			      System.exit(0);
+			    }
+			}
+		else if (boutonfilmReset == arg0.getSource()){
+			System.out.println("bouton reset");
+			clearSearch(panelfilmResult,panelfilmhelp);
+			panelfilmResult.updateUI();
 		}
-	else if (arg0.getSource() == boutonOKLivre){
-		System.out.println("recherche livre");
-		String sqlsearch = "SELECT * FROM LIVRE where TITRE LIKE '" + "%" + jtfLivre.getText() + "%"  + "'";
-		try {
-		      Class.forName("org.sqlite.JDBC");
-		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database Livre successfully");
-		      Statement stmt = connexion.createStatement();
-		      ResultSet rs = stmt.executeQuery(sqlsearch);
-		      nbResult = 0;
-		      clearSearch(panellivreResult,panellivrehelp);
-		      while ( rs.next() && nbResult <5) {
-		    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getString("image"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
-		    	nbResult++;
-			  }
-		      panellivreResult.updateUI();
-		      stmt.close();
-		      connexion.close();
-		    } catch ( Exception e ) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
-		    }
+		else if (boutonmusiqueReset == arg0.getSource()){
+			System.out.println("bouton reset");
+			clearSearch(panelmusiqueResult,panelmusiquehelp);
+			panelmusiqueResult.updateUI();
 		}
-	else if (boutonfilmReset == arg0.getSource()){
-		System.out.println("bouton reset");
-		clearSearch(panelfilmResult,panelfilmhelp);
-		panelfilmResult.updateUI();
-	}
-	else if (boutonmusiqueReset == arg0.getSource()){
-		System.out.println("bouton reset");
-		clearSearch(panelmusiqueResult,panelmusiquehelp);
-		panelmusiqueResult.updateUI();
-	}
-	else if (boutonlivreReset == arg0.getSource()){
-		System.out.println("bouton reset");
-		clearSearch(panellivreResult,panellivrehelp);
-		panellivreResult.updateUI();
-	}
-		else if (!lButton.isEmpty()){
-			for (JButton jb : lButton){
+		else if (boutonlivreReset == arg0.getSource()){
+			System.out.println("bouton reset");
+			clearSearch(panellivreResult,panellivrehelp);
+			panellivreResult.updateUI();
+		}
+		else if (!lButtonV.isEmpty()){
+			int cpt = 0;
+			for (JButton jb : lButtonV){
+				cpt++;
 				if (jb == arg0.getSource()){
-					System.out.println("OJ");
+					System.out.println(lIntegerV.get(cpt-1).toString());
+					new FicheVid(lIntegerV.get(cpt-1).intValue());
 				}
 			}
-		}
+		}	
+		else if (!lButtonL.isEmpty()){
+			int cpt = 0;
+			for (JButton jb : lButtonL){
+				cpt++;
+				if (jb == arg0.getSource()){
+					System.out.println(lIntegerL.get(cpt-1).toString());
+					new FicheVid(lIntegerL.get(cpt-1).intValue());
+				}
+			}
+		}	
+		else if (!lButtonM.isEmpty()){
+			int cpt = 0;
+			for (JButton jb : lButtonM){
+				cpt++;
+				if (jb == arg0.getSource()){
+					System.out.println(lIntegerM.get(cpt-1).toString());
+					new FicheVid(lIntegerM.get(cpt-1).intValue());
+				}
+			}
+		}	
 		
 	}
 	

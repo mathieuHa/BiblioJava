@@ -11,6 +11,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.JOptionPane;
@@ -33,6 +34,8 @@ public class AddJson {
 	
 	private boolean busy = false;
 	private boolean erreur = false;
+	private String inconnu = "unknown";
+	private Connection connexion;
 
 	public AddJson (){
 		
@@ -45,18 +48,8 @@ public class AddJson {
 	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	        connection.setRequestMethod("GET");
 	        connection.connect();
-	        /*while(HttpURLConnection.HTTP_OK != connection.getResponseCode()){
-	        	System.out.println("co pas ok");
-	        	try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	        }*/
 	        System.out.println(connection.getResponseCode());
 	        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK){
-	        	System.out.println("co ok");
 	        	copyInputStreamToFile(connection.getInputStream(),
 	                    new File("temp.json"));
 	        	return 0;
@@ -76,7 +69,7 @@ public class AddJson {
 	}
 	
 	public String buildRequestBook(String subject) {
-		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=40&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
+		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=2&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
 		System.out.println(s);
 		return s;
 	}
@@ -179,26 +172,10 @@ public class AddJson {
 				+ "'" + note + "',"
 				+ "'" + 0 + "',"
 				+ "'" + 0 + "');"; 
-				//System.out.println(sqlinsert);
 		try {
-			Class.forName("org.sqlite.JDBC");
-			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			//System.out.println("Opened database successfully dz");
 			Statement stmt = connexion.createStatement();
-		//ResultSet rs = stmt.executeQuery(sqltest);
-		
-		//System.out.println(rs.getInt("sum"));
-		//if (rs.getInt("sum")!=0){
-		//  System.out.println("existe deja");
-		// JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
-		//} else {
-			///System.out.println("preajout");
-		
 			stmt.executeUpdate(sqlinsert);
-			//System.out.println("ajout");
-		//}
 			stmt.close();
-			connexion.close();
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
@@ -240,27 +217,15 @@ public class AddJson {
                    		 + "'" + 0 + "');"; 
 		System.out.println(sqlinsert);
 		try {
-		      Class.forName("org.sqlite.JDBC");
-		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database successfully dz");
+			System.out.println("before");
 		      Statement stmt = connexion.createStatement();
-		      //ResultSet rs = stmt.executeQuery(sqltest);
-		      
-		      //System.out.println(rs.getInt("sum"));
-		      //if (rs.getInt("sum")!=0){
-		    	//  System.out.println("existe deja");
-		    	 // JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
-		      //} else {
-		    	  System.out.println("preajout");
-
-		    	  stmt.executeUpdate(sqlinsert);
-		    	  System.out.println("ajout");
-		      //}
+		      System.out.println("in");
+		      stmt.executeUpdate(sqlinsert);
+		      System.out.println("after");
 		      stmt.close();
-		      connexion.close();
 		    } catch ( Exception e ) {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
+		      //System.exit(0);
 		    }
 		busy = false;
     }
@@ -272,7 +237,6 @@ public class AddJson {
     	image = image.replace("'", "''");
     	auteur = auteur.replace("'", "''");
     	id = id.replace("'", "''");
-		//String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+title+"'";
 		String sqlinsert = "INSERT INTO AUDIO (CODE,TITRE,AUTEUR,ALBUM,IMAGE,EMPRUNTABLE,EMPRUNTE,"
 											+ "NBEMPRUNT,NBEXEMPLAIRE,DUREEEMPRUNT,TARIF) " +
                    "VALUES ('" + id + "',"
@@ -286,26 +250,10 @@ public class AddJson {
                    		 + "'" + 0 + "',"
                    		 + "'" + 0 + "',"
                    		 + "'" + 0 + "');"; 
-		System.out.println(sqlinsert);
 		try {
-		      Class.forName("org.sqlite.JDBC");
-		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database successfully dz");
 		      Statement stmt = connexion.createStatement();
-		      //ResultSet rs = stmt.executeQuery(sqltest);
-		      
-		      //System.out.println(rs.getInt("sum"));
-		      //if (rs.getInt("sum")!=0){
-		    	//  System.out.println("existe deja");
-		    	 // JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
-		      //} else {
-		    	  System.out.println("preajout");
-
-		    	  stmt.executeUpdate(sqlinsert);
-		    	  System.out.println("ajout");
-		      //}
+		      stmt.executeUpdate(sqlinsert);
 		      stmt.close();
-		      connexion.close();
 		    } catch ( Exception e ) {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		      System.exit(0);
@@ -314,17 +262,14 @@ public class AddJson {
     }
     
     public void addBook (String nameS){
-    	// faire dans un swing worker ralenti l'UI	
     	while (DL(this.buildRequestBook(nameS))!=0){
     		System.out.println("errreur");
 	    	try {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
-		JSONObject js = this.getObjectJS();
 		
 		String title = "";
 		String auteurs = "";
@@ -334,66 +279,74 @@ public class AddJson {
 		String id ="";
 		String category ="";
 		
-		JSONArray Array;
-		try {
-			Array = js.getJSONArray("items");
-			System.out.println("lenght " + Array.length());
-			for (int i=0; i<Array.length(); i++){
-				JSONObject item = Array.getJSONObject(i);
-				//System.out.println(item.getString("id"));
-				//System.out.println(item.getString("volumeInfo"));
-				id = item.getString("id");
-				JSONObject volumeInfo = item.getJSONObject("volumeInfo");
-				
-				title = volumeInfo.getString("title");
-				description = volumeInfo.getString("description");
-				date = volumeInfo.getString("publishedDate");
-				JSONArray autors = volumeInfo.getJSONArray("authors");
-				JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
-				image = imageLinks.getString("thumbnail");
-				//if (item.getJSONArray("categories") != null){
-				JSONArray cat = volumeInfo.getJSONArray("categories");
-				//JSONArray cat = volumeInfo.getJSONArray("categories");
-				System.out.println("toto");
-				if (cat != null){
-				for (int k=0; k<cat.length(); k++){
-					category = cat.getString(k) +" ";
-				}}
-				if (autors != null){
-				for (int j=0; j<autors.length(); j++){
-					auteurs+= autors.getString(j) +" ";
-				}}
+		if (erreur==true){
+			System.out.println("ERRRRRRRRRREURR");
+			erreur = false;}
+		else{
+			JSONObject js = this.getObjectJS();
+			if (js != null) {
+				JSONArray Array = js.optJSONArray("items");
+				if (Array != null) {
+					for (int i=0; i<Array.length(); i++){
+						JSONObject item = Array.optJSONObject(i);
+						if (item != null){
+							id = item.optString("id");
+							if (id == null) id = inconnu;
+							JSONObject volumeInfo = item.optJSONObject("volumeInfo");
+							if (volumeInfo != null){
+								title = volumeInfo.optString("title");
+								if (title == null) title = inconnu;
+								description = volumeInfo.optString("description");
+								if (description == null) description = inconnu;
+								date = volumeInfo.optString("publishedDate");
+								if (date == null) date = inconnu;
+								JSONArray autors = volumeInfo.optJSONArray("authors");
+								JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
+								image = imageLinks.optString("thumbnail");
+								if (image == null) image = "http://business-on-line.typepad.fr/.a/6a0120a8b67743970b01b7c7ca52af970b-pi";
+								JSONArray cat = volumeInfo.optJSONArray("categories");
+								if (cat != null){
+									for (int k=0; k<cat.length(); k++){
+											category+=cat.optString(k) +" ";
+									}
+									if (category == null) category =inconnu;
+								}else category =inconnu;
+								if (autors != null){
+									for (int j=0; j<autors.length(); j++){
+										auteurs+=autors.optString(j) +" ";
+									}
+									if (auteurs == null) auteurs =inconnu;
+								}else auteurs=inconnu;
+								
+								while (busy==true){
+									try {
+										System.out.println("erreur");
+										Thread.sleep(10);
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+								sendBook(title,auteurs,description,image,date,id,category);
+							}
+						}System.out.println("ITEM");
+					}
+				}System.out.println("ARRAY");
 			}
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			else System.out.println("JS");
 		}
-		
-			while (busy==true){
-				try {
-					System.out.println("erreur");
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			sendBook(title,auteurs,description,image,date,id,category);
-			System.out.println("fin");
-		
     }
     
     public void addVideo (int num){
     	while (DL(this.buildRequestMoviePopular(""+num))==1){
     		System.out.println("errreur");
 	    	try {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
-		JSONObject js = this.getObjectJS();
 		
 		String title = "";
 		String langage = "";
@@ -402,48 +355,53 @@ public class AddJson {
 		String image ="";
 		String date ="";
 		String id ="";
-		
-		JSONArray Array = js.optJSONArray("results");
-		System.out.println("lenght " + Array.length());
-		for (int i=0; i<Array.length(); i++){
-			JSONObject item = Array.optJSONObject(i);
-			id = String.valueOf(item.optInt("id"));
-			title = item.optString("original_title");
-			description = item.optString("overview");
-			date = item.optString("release_date");
-			image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.opt("backdrop_path"));
-			note = String.valueOf(item.optDouble("vote_average"));
-			langage = item.optString("original_language");
-			while (busy==true){
-				System.out.println("errreur");
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		if (erreur==true){
+			System.out.println("ERRRRRRRRRREURR");
+			erreur = false;}
+		else{
+			JSONObject js = this.getObjectJS();
+			if (js != null){
+				JSONArray Array = js.optJSONArray("results");
+				if (Array != null) {
+					for (int i=0; i<Array.length(); i++){
+						JSONObject item = Array.optJSONObject(i);
+						if (item != null) {
+							id = String.valueOf(item.optInt("id")); if (id == null) id = inconnu;
+							title = item.optString("original_title"); if (title == null) title = inconnu;
+							description = item.optString("overview"); if (description == null) description = inconnu;
+							date = item.optString("release_date"); if (date == null) date = inconnu;
+							if (item.opt("backdrop_path")!=null) image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.opt("backdrop_path"));
+							else image = "http://business-on-line.typepad.fr/.a/6a0120a8b67743970b01b7c7ca52af970b-pi";
+							if (item.opt("vote_average") != null) note = String.valueOf(item.opt("vote_average"));
+							else note = inconnu;
+							langage = item.optString("original_language"); if (langage == null) langage = inconnu;
+							while (busy==true){
+								System.out.println("errreur");
+								try {
+									Thread.sleep(10);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							}
+							sendFilm(title,description,image,date,id,langage,note);
+						}
+					}
 				}
-				
 			}
-			sendFilm(title,description,image,date,id,langage,note);
-			
 		}
     }
     
     public void addMusic (String name){
-    	System.out.println("MUSIQUE");
     	while (DL(this.buildRequestMusique(name))!=0){
     		System.out.println("errreur");
 	    	try {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
-    	//DL(this.buildRequestMusique(name));// faire dans un swing worker ralenti l'UI/	
-		JSONObject js = this.getObjectJS();
-		
-		
 		String title = "";
 		String album = "";
 		String auteur = "";
@@ -453,46 +411,64 @@ public class AddJson {
 			System.out.println("ERRRRRRRRRREURR");
 			erreur = false;}
 		else{
-		JSONObject track = js.optJSONObject("tracks");
-		JSONArray Array;
-		
-		try {
-			Array = track.getJSONArray("items");
-			
-		
-		if (!Array.equals(null)){
-		System.out.println("musique");
-		for (int i=0; i<Array.length(); i++){
-			JSONObject item = Array.optJSONObject(i);
-			id = String.valueOf(item.optString("id"));
-			title = item.optString("name");
-			JSONObject albumO = item.optJSONObject("album");
-			album = albumO.optString("name");
-			JSONArray imageA = albumO.optJSONArray("images");
-			image = imageA.optJSONObject(1).optString("url");
-			JSONArray artistA = item.optJSONArray("artists");
-			for (int j=0; j<artistA.length(); j++){
-				auteur+=artistA.optJSONObject(j).optString("name")+", ";
-			}
-			while (busy==true){
-				System.out.println("errreur");
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			JSONObject js = this.getObjectJS();
+			if (js != null){
+				JSONObject track = js.optJSONObject("tracks");
+				if (track != null){
+					JSONArray Array = track.optJSONArray("items");
+					if (Array != null){
+						for (int i=0; i<Array.length(); i++){
+							JSONObject item = Array.optJSONObject(i);
+							if (item != null) {
+								id = String.valueOf(item.optString("id")); if (id == null) id=inconnu;
+								title = item.optString("name");	if (title == null) title=inconnu;
+								JSONObject albumO = item.optJSONObject("album"); if (albumO == null) album = inconnu;
+								else  album = albumO.optString("name"); if (album == null) album = inconnu;
+								JSONArray imageA = albumO.optJSONArray("images"); if (imageA == null) image=inconnu;
+								else  image = imageA.optJSONObject(1).optString("url");  if (image==null) image="http://business-on-line.typepad.fr/.a/6a0120a8b67743970b01b7c7ca52af970b-pi";
+								JSONArray artistA = item.optJSONArray("artists"); if (artistA == null) auteur = inconnu;
+								else{
+									for (int j=0; j<artistA.length(); j++){
+										auteur+=artistA.optJSONObject(j).optString("name")+", ";
+									}
+									if (auteur == null) auteur = inconnu;
+								}
+								while (busy==true){
+									System.out.println("errreur");
+									try {
+										Thread.sleep(50);
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									
+								}
+								sendMusic(title,auteur,album,image,id);
+							}
+						}
+					}
 				}
-				
 			}
-			sendMusic(title,auteur,album,image,id);
-		}
-		
-		}
-		
-		} catch (JSONException e1) {
+	    }
+    }
+    
+    public void connexion () {
+    	try {
+			Class.forName("org.sqlite.JDBC");
+			connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully dz");
+		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
     }
+    public void deconnexion () {
+    	try {
+			Class.forName("org.sqlite.JDBC");
+			connexion.close();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

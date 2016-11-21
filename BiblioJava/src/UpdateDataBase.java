@@ -20,7 +20,7 @@ public class UpdateDataBase {
 			protected Void doInBackground() throws Exception {
 				// TODO Auto-generated method stub
 				LectureFichier();
-				DownloadItem a = new DownloadItem(1, ad, scanner);
+				//DownloadItem a = new DownloadItem(1, ad, scanner);
 				//
 				//while (scanner.hasNextLine()){
 					
