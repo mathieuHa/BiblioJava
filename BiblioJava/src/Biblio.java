@@ -103,7 +103,7 @@ public class Biblio implements ActionListener{
 	private JButton boutonlivreReset;
 	
 	public Biblio () {
-		create_table();
+		//create_table();
 	    connection ();
 	    lButton = new ArrayList<JButton>();
 	    lInteger = new ArrayList<Integer>();
@@ -393,9 +393,10 @@ public class Biblio implements ActionListener{
 		
 		frame.setVisible(true);
 
-		AddJson.addVideo();
-		AddJson.addMusic();
-		AddJson.addBook();
+		//AddJson.addVideo();
+		//AddJson.addMusic(1);
+		//AddJson.addBook(null);
+		UpdateDataBase updb = new UpdateDataBase();
 		
 		//AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY
 	}

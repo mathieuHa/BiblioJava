@@ -30,37 +30,66 @@ public class AddJson {
 	// BQAriOrylvVUloW2_n3NbEpWuPZlg6pO oth2
     
 	//https://api.spotify.com/v1/search?q=ok&type=track&limit=2
+	
+	private boolean busy = false;
+	private boolean erreur = false;
 
-	public AddJson (String urlS){
+	public AddJson (){
+		
+	}
+	
+	public int DL (String urlS){
 		URL url = null;
 	    try {
 	        url = new URL (urlS);
 	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	        connection.setRequestMethod("GET");
 	        connection.connect();
-	        if (HttpURLConnection.HTTP_OK == connection.getResponseCode()){
-	            copyInputStreamToFile(connection.getInputStream(),
+	        /*while(HttpURLConnection.HTTP_OK != connection.getResponseCode()){
+	        	System.out.println("co pas ok");
+	        	try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }*/
+	        System.out.println(connection.getResponseCode());
+	        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK){
+	        	System.out.println("co ok");
+	        	copyInputStreamToFile(connection.getInputStream(),
 	                    new File("temp.json"));
+	        	return 0;
 	        }
+	        else if (connection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST){
+	        	erreur = true;
+	        	return 0;
+	        }
+	        //System.exit(-1);
+	        
 	    } catch (MalformedURLException e1) {
 	        e1.printStackTrace();
 	    } catch (IOException e1) {
 	        e1.printStackTrace();
 	    }
+	    return 1;
 	}
 	
-	public static String buildRequestBook(String subject) {
+	public String buildRequestBook(String subject) {
 		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=40&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
+		System.out.println(s);
 		return s;
 	}
 	
-	public static String buildRequestMusique(String subject) {
+	public String buildRequestMusique(String subject) {
 		String s = "https://api.spotify.com/v1/search?q="+subject+"&type=track&limit=2";
+		System.out.println(s);
 		return s;
 	}
 	
-	public static String buildRequestMoviePopular(String subject) {
+	public String buildRequestMoviePopular(String subject) {
 		String s = "https://api.themoviedb.org/3/movie/popular?api_key=d53c99e97da849ea55b8ce31fd5e7666&language=en-FR&page="+subject;
+		System.out.println(s);
 		return s;
 	}
 	
@@ -126,7 +155,8 @@ public class AddJson {
     }
     
     
-    public static void sendFilm (String title, String description, String image, String date, String id, String language, String note ){
+    public void sendFilm (String title, String description, String image, String date, String id, String language, String note ){
+    	busy = true;
     	title = title.replace("'", "''");
     	description = description.replace("'", "''");
     	note = note.replace("'", "''");
@@ -149,11 +179,11 @@ public class AddJson {
 				+ "'" + note + "',"
 				+ "'" + 0 + "',"
 				+ "'" + 0 + "');"; 
-				System.out.println(sqlinsert);
+				//System.out.println(sqlinsert);
 		try {
 			Class.forName("org.sqlite.JDBC");
 			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			System.out.println("Opened database successfully dz");
+			//System.out.println("Opened database successfully dz");
 			Statement stmt = connexion.createStatement();
 		//ResultSet rs = stmt.executeQuery(sqltest);
 		
@@ -162,10 +192,10 @@ public class AddJson {
 		//  System.out.println("existe deja");
 		// JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
 		//} else {
-			System.out.println("preajout");
+			///System.out.println("preajout");
 		
 			stmt.executeUpdate(sqlinsert);
-			System.out.println("ajout");
+			//System.out.println("ajout");
 		//}
 			stmt.close();
 			connexion.close();
@@ -173,6 +203,7 @@ public class AddJson {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
 		}
+		busy = false;
     }
     
     public static String escapeString (String str) {
@@ -182,7 +213,8 @@ public class AddJson {
     }
     
      
-    public static void sendBook (String title, String auteurs, String description, String image, String date, String id, String category){
+    public void sendBook (String title, String auteurs, String description, String image, String date, String id, String category){
+    	busy = true;
     	title = title.replace("'", "''");
     	description = description.replace("'", "''");
     	auteurs = auteurs.replace("'", "''");
@@ -230,12 +262,15 @@ public class AddJson {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		      System.exit(0);
 		    }
+		busy = false;
     }
     
-    public static void sendMusic (String title, String auteur, String album, String image, String id){
+    public void sendMusic (String title, String auteur, String album, String image, String id){
+    	busy = true;
     	title = title.replace("'", "''");
     	album = album.replace("'", "''");
     	image = image.replace("'", "''");
+    	auteur = auteur.replace("'", "''");
     	id = id.replace("'", "''");
 		//String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+title+"'";
 		String sqlinsert = "INSERT INTO AUDIO (CODE,TITRE,AUTEUR,ALBUM,IMAGE,EMPRUNTABLE,EMPRUNTE,"
@@ -275,11 +310,21 @@ public class AddJson {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		      System.exit(0);
 		    }
+		busy = false;
     }
     
-    public static void addBook (){
-    	AddJson addd = new AddJson(AddJson.buildRequestBook("flower"));// faire dans un swing worker ralenti l'UI	
-		JSONObject js = addd.getObjectJS();
+    public void addBook (String nameS){
+    	// faire dans un swing worker ralenti l'UI	
+    	while (DL(this.buildRequestBook(nameS))!=0){
+    		System.out.println("errreur");
+	    	try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+		JSONObject js = this.getObjectJS();
 		
 		String title = "";
 		String auteurs = "";
@@ -289,8 +334,9 @@ public class AddJson {
 		String id ="";
 		String category ="";
 		
+		JSONArray Array;
 		try {
-			JSONArray Array = js.getJSONArray("items");
+			Array = js.getJSONArray("items");
 			System.out.println("lenght " + Array.length());
 			for (int i=0; i<Array.length(); i++){
 				JSONObject item = Array.getJSONObject(i);
@@ -305,29 +351,49 @@ public class AddJson {
 				JSONArray autors = volumeInfo.getJSONArray("authors");
 				JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
 				image = imageLinks.getString("thumbnail");
-				//if (item.optJSONArray("categories") != null){
-				JSONArray cat = volumeInfo.optJSONArray("categories");
+				//if (item.getJSONArray("categories") != null){
+				JSONArray cat = volumeInfo.getJSONArray("categories");
 				//JSONArray cat = volumeInfo.getJSONArray("categories");
 				System.out.println("toto");
 				if (cat != null){
 				for (int k=0; k<cat.length(); k++){
 					category = cat.getString(k) +" ";
 				}}
+				if (autors != null){
 				for (int j=0; j<autors.length(); j++){
 					auteurs+= autors.getString(j) +" ";
-				}
-				
-				sendBook(title,auteurs,description,image,date,id,category);
+				}}
 			}
-		} catch (JSONException e) {
+		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+		
+			while (busy==true){
+				try {
+					System.out.println("erreur");
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			sendBook(title,auteurs,description,image,date,id,category);
+			System.out.println("fin");
+		
     }
     
-    public static void addVideo (){
-    	AddJson addd = new AddJson(AddJson.buildRequestMoviePopular("1"));// faire dans un swing worker ralenti l'UI	
-		JSONObject js = addd.getObjectJS();
+    public void addVideo (int num){
+    	while (DL(this.buildRequestMoviePopular(""+num))==1){
+    		System.out.println("errreur");
+	    	try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+		JSONObject js = this.getObjectJS();
 		
 		String title = "";
 		String langage = "";
@@ -337,29 +403,45 @@ public class AddJson {
 		String date ="";
 		String id ="";
 		
-		try {
-			JSONArray Array = js.getJSONArray("results");
-			System.out.println("lenght " + Array.length());
-			for (int i=0; i<Array.length(); i++){
-				JSONObject item = Array.getJSONObject(i);
-				id = String.valueOf(item.getInt("id"));
-				title = item.getString("original_title");
-				description = item.getString("overview");
-				date = item.getString("release_date");
-				image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.get("backdrop_path"));
-				note = String.valueOf(item.getDouble("vote_average"));
-				langage = item.getString("original_language");
-				sendFilm(title,description,image,date,id,langage,note);
+		JSONArray Array = js.optJSONArray("results");
+		System.out.println("lenght " + Array.length());
+		for (int i=0; i<Array.length(); i++){
+			JSONObject item = Array.optJSONObject(i);
+			id = String.valueOf(item.optInt("id"));
+			title = item.optString("original_title");
+			description = item.optString("overview");
+			date = item.optString("release_date");
+			image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.opt("backdrop_path"));
+			note = String.valueOf(item.optDouble("vote_average"));
+			langage = item.optString("original_language");
+			while (busy==true){
+				System.out.println("errreur");
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			sendFilm(title,description,image,date,id,langage,note);
+			
 		}
     }
     
-    public static void addMusic (){
-    	AddJson addd = new AddJson(AddJson.buildRequestMusique("1"));// faire dans un swing worker ralenti l'UI	
-		JSONObject js = addd.getObjectJS();
+    public void addMusic (String name){
+    	System.out.println("MUSIQUE");
+    	while (DL(this.buildRequestMusique(name))!=0){
+    		System.out.println("errreur");
+	    	try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	//DL(this.buildRequestMusique(name));// faire dans un swing worker ralenti l'UI/	
+		JSONObject js = this.getObjectJS();
 		
 		
 		String title = "";
@@ -367,28 +449,50 @@ public class AddJson {
 		String auteur = "";
 		String image ="";
 		String id ="";
+		if (erreur==true){
+			System.out.println("ERRRRRRRRRREURR");
+			erreur = false;}
+		else{
+		JSONObject track = js.optJSONObject("tracks");
+		JSONArray Array;
 		
 		try {
-			JSONObject track = js.getJSONObject("tracks");
-			JSONArray Array = track.getJSONArray("items");
-			System.out.println("lenght " + Array.length());
-			for (int i=0; i<Array.length(); i++){
-				JSONObject item = Array.getJSONObject(i);
-				id = String.valueOf(item.getString("id"));
-				title = item.getString("name");
-				JSONObject albumO = item.getJSONObject("album");
-				album = albumO.getString("name");
-				JSONArray imageA = albumO.getJSONArray("images");
-				image = imageA.getJSONObject(1).getString("url");
-				JSONArray artistA = item.getJSONArray("artists");
-				for (int j=0; j<artistA.length(); j++){
-					auteur+=artistA.getJSONObject(j).getString("name")+", ";
-				}
-				sendMusic(title,auteur,album,image,id);
+			Array = track.getJSONArray("items");
+			
+		
+		if (!Array.equals(null)){
+		System.out.println("musique");
+		for (int i=0; i<Array.length(); i++){
+			JSONObject item = Array.optJSONObject(i);
+			id = String.valueOf(item.optString("id"));
+			title = item.optString("name");
+			JSONObject albumO = item.optJSONObject("album");
+			album = albumO.optString("name");
+			JSONArray imageA = albumO.optJSONArray("images");
+			image = imageA.optJSONObject(1).optString("url");
+			JSONArray artistA = item.optJSONArray("artists");
+			for (int j=0; j<artistA.length(); j++){
+				auteur+=artistA.optJSONObject(j).optString("name")+", ";
 			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			while (busy==true){
+				System.out.println("errreur");
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			sendMusic(title,auteur,album,image,id);
 		}
+		
+		}
+		
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    }
     }
 }
