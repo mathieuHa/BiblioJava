@@ -525,6 +525,7 @@ public class Biblio implements ActionListener{
 			    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getString("image"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
 			    	lButtonL.add(obj.getButtonVP());
 			    	lIntegerL.add(rs.getInt("id"));
+			    	System.out.println(lButtonL.size());
 			    	obj.getButtonVP().addActionListener(this);
 			    	nbResult++;
 				  }
@@ -567,7 +568,7 @@ public class Biblio implements ActionListener{
 				cpt++;
 				if (jb == arg0.getSource()){
 					System.out.println(lIntegerL.get(cpt-1).toString());
-					new FicheVid(lIntegerL.get(cpt-1).intValue());
+					new FicheLivre(lIntegerL.get(cpt-1).intValue());
 				}
 			}
 		}	
@@ -577,7 +578,7 @@ public class Biblio implements ActionListener{
 				cpt++;
 				if (jb == arg0.getSource()){
 					System.out.println(lIntegerM.get(cpt-1).toString());
-					new FicheVid(lIntegerM.get(cpt-1).intValue());
+					new FicheMusique(lIntegerM.get(cpt-1).intValue());
 				}
 			}
 		}	

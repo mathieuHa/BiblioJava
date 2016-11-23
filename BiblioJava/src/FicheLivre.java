@@ -10,39 +10,38 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public class FicheVid extends FicheDoc {
+public class FicheLivre extends FicheDoc {
 
-	public FicheVid(int Id) {
+	public FicheLivre(int Id) {
 		super(Id);
 		req(Id);
-		super.addUI();
-		
-		
-		super.updatePanel();
 		// TODO Auto-generated constructor stub
 	}
-	
 	public void req (int Id){
-		String sqlsearch = "SELECT * FROM VIDEO where ID = " + Id;
+		String sqlsearch = "SELECT * FROM LIVRE where ID = " + Id;
 		 try {
 			Class.forName("org.sqlite.JDBC");
 			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
 	        System.out.println("Opened database Video successfully");
 	        Statement stmt = connexion.createStatement();
 	        ResultSet rs = stmt.executeQuery(sqlsearch);
-	        titre =rs.getString("titre");
-	        description = rs.getString("description");
-	        image = rs.getString("image");
-	        //auteur = rs.getString("auteurs");
-			//labelImage = new JLabel( (Icon) new ImageIcon( new URL(rs.getString("image")) ) );
-			//System.out.println(rs.getString("image"));
+	        labelTitre.setText(rs.getString("titre"));
+	        labelDescription.setText(rs.getString("description"));
+	        try {
+				labelImage = new JLabel( (Icon) new ImageIcon( new URL(rs.getString("image")) ) );
+				System.out.println(rs.getString("image"));
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				labelImage = new JLabel("erreur");
+				e.printStackTrace();
+			}
 	        stmt.close();
 		    connexion.close();
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
+	      
 	}
-	
+
 }

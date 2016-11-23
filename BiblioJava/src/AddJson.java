@@ -370,7 +370,7 @@ public class AddJson {
 							title = item.optString("original_title"); if (title == null) title = inconnu;
 							description = item.optString("overview"); if (description == null) description = inconnu;
 							date = item.optString("release_date"); if (date == null) date = inconnu;
-							if (item.opt("backdrop_path")!=null) image = "http://image.tmdb.org/t/p/w185/" +String.valueOf(item.opt("backdrop_path"));
+							if (item.opt("backdrop_path")!=null) image = "http://image.tmdb.org/t/p/w342/" +String.valueOf(item.opt("backdrop_path"));
 							else image = "http://business-on-line.typepad.fr/.a/6a0120a8b67743970b01b7c7ca52af970b-pi";
 							if (item.opt("vote_average") != null) note = String.valueOf(item.opt("vote_average"));
 							else note = inconnu;
