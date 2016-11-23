@@ -1,13 +1,26 @@
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
-import javax.swing.*;
 
 public class Autentification implements ActionListener {
 	private JFrame frame;
@@ -78,11 +91,11 @@ public class Autentification implements ActionListener {
 		c.gridx = 200; c.gridy = 300;
 		panelname.add(boutonconnexion,c);
 		
-		
+		this.user = user;
 		frame.add(panelname);
-		afficheBDDVideo();
-		afficheBDDAudio();
-		afficheBDDLivre();
+		//afficheBDDVideo();
+		//afficheBDDAudio();
+		//afficheBDDLivre();
 
 
 		
@@ -126,10 +139,31 @@ public class Autentification implements ActionListener {
 						         int id = rs.getInt("id");
 						         String  username = rs.getString("username");
 						         String  password = rs.getString("password");
-						         if (username.equals(fieldlogin.getText()) && password.equals(fieldpassword.getText())){
+						         String  pass = fieldpassword.getText();
+									try {
+							            // Create MessageDigest instance for MD5
+							            MessageDigest md = MessageDigest.getInstance("MD5");
+							            //Add password bytes to digest
+							            md.update(pass.getBytes());
+							            //Get the hash's bytes 
+							            byte[] bytes = md.digest();
+							            //This bytes[] has bytes in decimal format;
+							            //Convert it to hexadecimal format
+							            StringBuilder sb = new StringBuilder();
+							            for(int i=0; i< bytes.length ;i++)
+							            {
+							                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+							            }
+							            //Get complete hashed password in hex format
+							            pass = sb.toString();
+							        } 
+							        catch (NoSuchAlgorithmException e) 
+							        {
+							            e.printStackTrace();
+							        }
+						         if (username.equals(fieldlogin.getText()) && password.equals(pass)){
 						        	 System.out.println("connexion");
 						        	 user.setLogin(fieldlogin.getText());
-						        	 user.setPassword(fieldpassword.getText());
 						        	 ok = true;
 						        	 frame.dispose();
 						         }
@@ -157,9 +191,31 @@ public class Autentification implements ActionListener {
 			}
 			else {
 				System.out.println("nouvelle inscription");
+				String Password = null;
+				try {
+		            // Create MessageDigest instance for MD5
+		            MessageDigest md = MessageDigest.getInstance("MD5");
+		            //Add password bytes to digest
+		            md.update(fieldpassword.getText().getBytes());
+		            //Get the hash's bytes 
+		            byte[] bytes = md.digest();
+		            //This bytes[] has bytes in decimal format;
+		            //Convert it to hexadecimal format
+		            StringBuilder sb = new StringBuilder();
+		            for(int i=0; i< bytes.length ;i++)
+		            {
+		                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+		            }
+		            //Get complete hashed password in hex format
+		            Password = sb.toString();
+		        } 
+		        catch (NoSuchAlgorithmException e) 
+		        {
+		            e.printStackTrace();
+		        }
 				String sqltest = "SELECT COUNT(*) AS sum FROM LOGIN where USERNAME='"+fieldlogin.getText()+"'";
-				String sqlinsert = "INSERT INTO LOGIN (USERNAME,PASSWORD) " +
-		                   "VALUES ('"+fieldlogin.getText()+"','"+fieldpassword.getText()+"');"; 
+				String sqlinsert = "INSERT INTO LOGIN (USERNAME,CREDIT,PASSWORD) " +
+		                   "VALUES ('"+fieldlogin.getText()+"','25','"+Password+"');"; 
 				try {
 				      Class.forName("org.sqlite.JDBC");
 				      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");

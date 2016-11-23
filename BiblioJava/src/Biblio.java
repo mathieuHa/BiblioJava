@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -17,7 +16,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -108,6 +105,7 @@ public class Biblio implements ActionListener{
 	
 	public Biblio () {
 		//create_table();
+		fill_tables();
 	    connection ();
 	    lButtonV = new ArrayList<JButton>();
 	    lIntegerV = new ArrayList<Integer>();
@@ -142,7 +140,7 @@ public class Biblio implements ActionListener{
 	          while (autentification.getOk()==false){
 	        	  // attente de l'authentification
 	        	  try {
-	                  Thread.sleep(100);
+	                  Thread.sleep(10);
 	                } catch (InterruptedException e) {
 	                  e.printStackTrace();
 	                } 
@@ -152,6 +150,7 @@ public class Biblio implements ActionListener{
 	        public void done(){            
 	          if(SwingUtilities.isEventDispatchThread()){
 	        	  user = autentification.getUser();
+	        	  user.getDB();
 	        	  System.out.println(user.toString());
 	        	  afficheLibrairy();
 	          }
@@ -159,6 +158,34 @@ public class Biblio implements ActionListener{
 	      };
 	      //On lance le SwingWorker
 	      sw.execute();
+	}
+	
+	public void fill_tables (){
+		try {
+		      Class.forName("org.sqlite.JDBC");
+		      connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+		      System.out.println("Opened database successfully creat table");
+		      stmt = connexion.createStatement();
+		      String sqlaudiorequest = "UPDATE AUDIO SET NBEXEMPLAIRE = 2";
+		      String sqlvideorequest = "UPDATE VIDEO SET NBEXEMPLAIRE = 2";
+		      String sqllivrerequest = "UPDATE LIVRE SET NBEXEMPLAIRE = 2";
+		      String sqlaudiorequest1 = "UPDATE AUDIO SET TARIF = 1";
+		      String sqlvideorequest1 = "UPDATE VIDEO SET TARIF = 3";
+		      String sqllivrerequest1 = "UPDATE LIVRE SET TARIF = 2";
+		      
+		      stmt.executeUpdate(sqlvideorequest);
+		      stmt.executeUpdate(sqlaudiorequest);
+		      stmt.executeUpdate(sqllivrerequest);
+		      stmt.executeUpdate(sqlvideorequest1);
+		      stmt.executeUpdate(sqlaudiorequest1);
+		      stmt.executeUpdate(sqllivrerequest1);
+		      stmt.close();
+		      connexion.close();
+		      
+		    } catch ( Exception e ) {
+		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		      System.exit(0);
+		    }
 	}
 	
 	public void create_table () {
@@ -171,54 +198,52 @@ public class Biblio implements ActionListener{
 	      String sqllogin = "CREATE TABLE LOGIN " +
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
                   " USERNAME           TEXT    NOT NULL, " + 
+                  " CREDIT             INT     NOT NULL, " + 
                   " PASSWORD           TEXT    NOT NULL)";
 	      String sqlvideo = "CREATE TABLE VIDEO " +
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " CODE               TEXT    NOT NULL, " + 
                   " TITRE              TEXT    NOT NULL, " +
                   " ANNEE              TEXT    NOT NULL, " +
                   " IMAGE              TEXT    NOT NULL, " +
-                  " EMPRUNTABLE        TINYINT NOT NULL, " +
-                  " EMPRUNTE           TINYINT NOT NULL, " +
+                  " DESCRIPTION        TEXT    NOT NULL, " +
+                  " LANGUAGE           TEXT    NOT NULL, " +
                   " NBEMPRUNT          INT     NOT NULL, " +
                   " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " DESCRIPTION        TEXT    NOT NULL, " +
-                  " LANGUAGE            TEXT    NOT NULL, " +
                   " NOTE               TEXT    NOT NULL, " +
-                  " DUREEEMPRUNT       INT     NOT NULL, " +
                   " TARIF		       INT     NOT NULL) ";
 	      
 	      String sqlaudio = "CREATE TABLE AUDIO " +
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " CODE               TEXT    NOT NULL, " + 
                   " TITRE              TEXT    NOT NULL, " +
                   " AUTEUR             TEXT    NOT NULL, " +
                   " ALBUM              TEXT    NOT NULL, " +
                   " IMAGE              TEXT    NOT NULL, " +
-                  " EMPRUNTABLE        TINYINT NOT NULL, " +
-                  " EMPRUNTE           TINYINT NOT NULL, " +
                   " NBEMPRUNT          INT     NOT NULL, " +
                   " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " DUREEEMPRUNT       INT     NOT NULL, " +
                   " TARIF		       INT     NOT NULL) ";
+	      
+	      String sqlfiche = "CREATE TABLE FICHE " +
+                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+                  " USERID             INT     NOT NULL, " + 
+                  " DOCID              INT     NOT NULL, " +
+                  " DATEEMPRUNT        TEXT    NOT NULL, " +
+                  " DUREE             TEXT    NOT NULL)  ";
+          
 	      
 	      String sqllivre = "CREATE TABLE LIVRE " +
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " CODE               TEXT    NOT NULL, " + 
                   " TITRE              TEXT    NOT NULL, " +
                   " AUTEUR             TEXT    NOT NULL, " +
                   " ANNEE              TEXT    NOT NULL, " +
                   " CATEGORY           TEXT    NOT NULL, " +
                   " IMAGE              TEXT    NOT NULL, " +
-                  " EMPRUNTABLE        TINYINT NOT NULL, " +
-                  " EMPRUNTE           TINYINT NOT NULL, " +
                   " NBEMPRUNT          INT     NOT NULL, " +
                   " NBEXEMPLAIRE       INT     NOT NULL, " +
                   " DESCRIPTION        TEXT    NOT NULL, " +
-                  " DUREEEMPRUNT       INT     NOT NULL, " +
                   " TARIF		       INT     NOT NULL) ";
 	      
 	      stmt.executeUpdate(sqllogin);
+	      stmt.executeUpdate(sqlfiche);
 	      stmt.executeUpdate(sqlvideo);
 	      stmt.executeUpdate(sqlaudio);
 	      stmt.executeUpdate(sqllivre);
@@ -497,6 +522,7 @@ public class Biblio implements ActionListener{
 			    	  obj = new ObjList(rs.getString("titre"),rs.getString("album"),rs.getString("auteur"),"",rs.getString("image"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
 			    	  lButtonM.add(obj.getButtonVP());
 				      lIntegerM.add(rs.getInt("id"));
+				      System.out.println(lButtonM.size());
 				      obj.getButtonVP().addActionListener(this);
 			    	  nbResult++;
 				  }
@@ -552,36 +578,39 @@ public class Biblio implements ActionListener{
 			clearSearch(panellivreResult,panellivrehelp);
 			panellivreResult.updateUI();
 		}
-		else if (!lButtonV.isEmpty()){
-			int cpt = 0;
-			for (JButton jb : lButtonV){
-				cpt++;
-				if (jb == arg0.getSource()){
-					System.out.println(lIntegerV.get(cpt-1).toString());
-					new FicheVid(lIntegerV.get(cpt-1).intValue());
+		else {
+			if (!lButtonV.isEmpty()){
+				int cpt = 0;
+				for (JButton jb : lButtonV){
+					cpt++;
+					if (jb == arg0.getSource()){
+						System.out.println(lIntegerV.get(cpt-1).toString());
+						new FicheVid(lIntegerV.get(cpt-1).intValue());
+					}
 				}
 			}
-		}	
-		else if (!lButtonL.isEmpty()){
-			int cpt = 0;
-			for (JButton jb : lButtonL){
-				cpt++;
-				if (jb == arg0.getSource()){
-					System.out.println(lIntegerL.get(cpt-1).toString());
-					new FicheLivre(lIntegerL.get(cpt-1).intValue());
+			if (!lButtonL.isEmpty()){
+				int cpt = 0;
+				for (JButton jb1 : lButtonL){
+					cpt++;
+					if (jb1 == arg0.getSource()){
+						System.out.println(lIntegerL.get(cpt-1).toString());
+						new FicheLivre(lIntegerL.get(cpt-1).intValue(),user);
+					}
 				}
-			}
-		}	
-		else if (!lButtonM.isEmpty()){
-			int cpt = 0;
-			for (JButton jb : lButtonM){
-				cpt++;
-				if (jb == arg0.getSource()){
-					System.out.println(lIntegerM.get(cpt-1).toString());
-					new FicheMusique(lIntegerM.get(cpt-1).intValue());
+			}	
+			if (!lButtonM.isEmpty()){
+				int cpt = 0;
+				for (JButton jb2 : lButtonM){
+					cpt++;
+					if (jb2 == arg0.getSource()){
+						System.out.println(lIntegerM.get(cpt-1).toString());
+						new FicheMusique(lIntegerM.get(cpt-1).intValue());
+					}
 				}
-			}
-		}	
+			}	
+		}
+		
 		
 	}
 	

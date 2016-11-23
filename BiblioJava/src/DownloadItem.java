@@ -13,7 +13,7 @@ public class DownloadItem {
 	public JProgressBar progressBar = new JProgressBar();
 	public DownloadItem(int num, AddJson ad, Scanner scanner) {
 		// TODO Auto-generated constructor stub
-		progressBar.setMaximum(100);
+		progressBar.setMaximum(10);
 		JFrame jf = new JFrame();
 		
 		jf.add(progressBar);
@@ -26,15 +26,15 @@ public class DownloadItem {
 				
 				// TODO Auto-generated method stub
 				ad.connexion();
-				for (int i = 1; i<100; i++){
+				for (int i = 1; i<10; i++){
 					
 					String s = scanner.nextLine();
 					System.out.println(s+" "+i);
 					ad.addVideo(i);
 					//setProgress(i);
-					//ad.addBook(s);
+					ad.addBook(s);
 					//setProgress(i);
-					//System.out.println("before");
+					System.out.println("after book");
 					ad.addMusic(s);
 					//System.out.println("after");
 					setProgress(i);

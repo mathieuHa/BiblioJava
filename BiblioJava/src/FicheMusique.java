@@ -15,6 +15,7 @@ public class FicheMusique extends FicheDoc {
 	public FicheMusique(int Id) {
 		super(Id);
 		req(Id);
+		super.addUI();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -23,19 +24,12 @@ public class FicheMusique extends FicheDoc {
 		 try {
 			Class.forName("org.sqlite.JDBC");
 			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-	        System.out.println("Opened database Video successfully");
+	        System.out.println("Opened database Musique successfully");
 	        Statement stmt = connexion.createStatement();
 	        ResultSet rs = stmt.executeQuery(sqlsearch);
-	        labelTitre.setText(rs.getString("titre"));
-	        labelDescription.setText(rs.getString("description"));
-	        try {
-				labelImage = new JLabel( (Icon) new ImageIcon( new URL(rs.getString("image")) ) );
-				System.out.println(rs.getString("image"));
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				labelImage = new JLabel("erreur");
-				e.printStackTrace();
-			}
+	        titre =rs.getString("titre");
+	        description = rs.getString("description");
+	        image = rs.getString("image");
 	        stmt.close();
 		    connexion.close();
 		} catch (ClassNotFoundException | SQLException e) {

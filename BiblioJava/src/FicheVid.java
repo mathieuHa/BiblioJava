@@ -1,14 +1,8 @@
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 public class FicheVid extends FicheDoc {
 
@@ -33,9 +27,6 @@ public class FicheVid extends FicheDoc {
 	        titre =rs.getString("titre");
 	        description = rs.getString("description");
 	        image = rs.getString("image");
-	        //auteur = rs.getString("auteurs");
-			//labelImage = new JLabel( (Icon) new ImageIcon( new URL(rs.getString("image")) ) );
-			//System.out.println(rs.getString("image"));
 	        stmt.close();
 		    connexion.close();
 		} catch (ClassNotFoundException | SQLException e) {

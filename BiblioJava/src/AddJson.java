@@ -10,17 +10,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import javax.swing.JOptionPane;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import org.apache.commons.lang.StringEscapeUtils;
 
 public class AddJson {
 	
@@ -69,13 +64,13 @@ public class AddJson {
 	}
 	
 	public String buildRequestBook(String subject) {
-		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=2&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
+		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=10&langRestrict=fr&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
 		System.out.println(s);
 		return s;
 	}
 	
 	public String buildRequestMusique(String subject) {
-		String s = "https://api.spotify.com/v1/search?q="+subject+"&type=track&limit=2";
+		String s = "https://api.spotify.com/v1/search?q="+subject+"&type=track&limit=10";
 		System.out.println(s);
 		return s;
 	}
@@ -96,15 +91,15 @@ public class AddJson {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONArray();
+			return null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONArray();
+			return null;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONArray();
+			return null;
 		}
 	}
 	
@@ -118,15 +113,15 @@ public class AddJson {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONObject();
+			return null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONObject();
+			return null;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new JSONObject();
+			return null;
 		}
 	}
     
@@ -157,20 +152,17 @@ public class AddJson {
     	date = date.replace("'", "''");
     	id = id.replace("'", "''");
     	language = language.replace("'", "''");
-    	String sqlinsert = "INSERT INTO VIDEO (CODE,TITRE,ANNEE,IMAGE,EMPRUNTABLE,EMPRUNTE,"
-				+ "NBEMPRUNT,NBEXEMPLAIRE,DESCRIPTION,LANGUAGE,NOTE,DUREEEMPRUNT,TARIF) " +
-				"VALUES ('" + id + "',"
+    	String sqlinsert = "INSERT INTO VIDEO (TITRE,ANNEE,IMAGE,"
+				+ "NBEMPRUNT,NBEXEMPLAIRE,DESCRIPTION,LANGUAGE,NOTE,TARIF) " +
+				"VALUES ("
 				+ "'" + title + "',"
 				+ "'" + date + "',"
 				+ "'" + image + "',"
 				+ "'" + 0 + "',"
 				+ "'" + 0 + "',"
-				+ "'" + 0 + "',"
-				+ "'" + 0 + "',"
 				+ "'" + description + "',"
 				+ "'" + language + "',"
 				+ "'" + note + "',"
-				+ "'" + 0 + "',"
 				+ "'" + 0 + "');"; 
 		try {
 			Statement stmt = connexion.createStatement();
@@ -178,31 +170,30 @@ public class AddJson {
 			stmt.close();
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			System.exit(0);
+			//System.exit(0);
 		}
 		busy = false;
     }
     
-    public static String escapeString (String str) {
-		String results = StringEscapeUtils.escapeJava(str);
-		System.out.println(results);
-		return results;
-    }
+    
     
      
     public void sendBook (String title, String auteurs, String description, String image, String date, String id, String category){
     	busy = true;
     	title = title.replace("'", "''");
-    	description = description.replace("'", "''");
+    	//description = description.replace("/", " ");
+    	description = description.replace("\"", " ");
+    	description = description.replace("'", " ");
+    	description = description.replace("’", " ");
     	auteurs = auteurs.replace("'", "''");
     	image = image.replace("'", "''");
     	date = date.replace("'", "''");
     	id = id.replace("'", "''");
     	category = category.replace("'", "''");
 		//String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+title+"'";
-		String sqlinsert = "INSERT INTO LIVRE (CODE,TITRE,AUTEUR,ANNEE,CATEGORY,IMAGE,EMPRUNTABLE,EMPRUNTE,"
-											+ "NBEMPRUNT,NBEXEMPLAIRE,DESCRIPTION,DUREEEMPRUNT,TARIF) " +
-                   "VALUES ('" + id + "',"
+		String sqlinsert = "INSERT INTO LIVRE (TITRE,AUTEUR,ANNEE,CATEGORY,IMAGE,"
+											+ "NBEMPRUNT,NBEXEMPLAIRE,DESCRIPTION,TARIF) " +
+                   "VALUES ("
                    		 + "'" + title + "',"
                    		 + "'" + auteurs + "',"
                    		 + "'" + date + "',"
@@ -210,10 +201,7 @@ public class AddJson {
                    		 + "'" + image + "',"
                    		 + "'" + 0 + "',"
                    		 + "'" + 0 + "',"
-                   		 + "'" + 0 + "',"
-                   		 + "'" + 0 + "',"
                    		 + "'" + description + "',"
-                   		 + "'" + 0 + "',"
                    		 + "'" + 0 + "');"; 
 		System.out.println(sqlinsert);
 		try {
@@ -222,11 +210,14 @@ public class AddJson {
 		      System.out.println("in");
 		      stmt.executeUpdate(sqlinsert);
 		      System.out.println("after");
+		      stmt.isCloseOnCompletion();
 		      stmt.close();
-		    } catch ( Exception e ) {
+		      System.out.println("afterclose");
+		    } catch ( SQLException e) {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		      //System.exit(0);
 		    }
+		System.out.println("afterbook");
 		busy = false;
     }
     
@@ -236,32 +227,31 @@ public class AddJson {
     	album = album.replace("'", "''");
     	image = image.replace("'", "''");
     	auteur = auteur.replace("'", "''");
-    	id = id.replace("'", "''");
-		String sqlinsert = "INSERT INTO AUDIO (CODE,TITRE,AUTEUR,ALBUM,IMAGE,EMPRUNTABLE,EMPRUNTE,"
-											+ "NBEMPRUNT,NBEXEMPLAIRE,DUREEEMPRUNT,TARIF) " +
-                   "VALUES ('" + id + "',"
+    	//id = id.replace("'", "''");
+		String sqlinsert = "INSERT INTO AUDIO (TITRE,AUTEUR,ALBUM,IMAGE,"
+											+ "NBEMPRUNT,NBEXEMPLAIRE,TARIF) " +
+                   "VALUES ("
                    		 + "'" + title + "',"
                    		 + "'" + auteur + "',"
                    		 + "'" + album + "',"
                    		 + "'" + image + "',"
                    		 + "'" + 0 + "',"
                    		 + "'" + 0 + "',"
-                   		 + "'" + 0 + "',"
-                   		 + "'" + 0 + "',"
-                   		 + "'" + 0 + "',"
                    		 + "'" + 0 + "');"; 
+		System.out.println(sqlinsert);
 		try {
 		      Statement stmt = connexion.createStatement();
 		      stmt.executeUpdate(sqlinsert);
 		      stmt.close();
 		    } catch ( Exception e ) {
 		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
+		      //System.exit(0);
 		    }
 		busy = false;
     }
     
     public void addBook (String nameS){
+    	System.out.println("BOK");
     	while (DL(this.buildRequestBook(nameS))!=0){
     		System.out.println("errreur");
 	    	try {
@@ -295,11 +285,8 @@ public class AddJson {
 							JSONObject volumeInfo = item.optJSONObject("volumeInfo");
 							if (volumeInfo != null){
 								title = volumeInfo.optString("title");
-								if (title == null) title = inconnu;
 								description = volumeInfo.optString("description");
-								if (description == null) description = inconnu;
 								date = volumeInfo.optString("publishedDate");
-								if (date == null) date = inconnu;
 								JSONArray autors = volumeInfo.optJSONArray("authors");
 								JSONObject imageLinks = volumeInfo.optJSONObject("imageLinks");
 								image = imageLinks.optString("thumbnail");
@@ -318,26 +305,39 @@ public class AddJson {
 									if (auteurs == null) auteurs =inconnu;
 								}else auteurs=inconnu;
 								
-								while (busy==true){
-									try {
-										System.out.println("erreur");
-										Thread.sleep(10);
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
+								if (title != null && description !=null && date!=null && autors != null && cat!=null && auteurs !=null && category !=null && image != null) {//title = inconnu;
+									
+								
+									while (busy==true){
+										try {
+											System.out.println("erreur");
+											Thread.sleep(10);
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
 									}
-								}
-								sendBook(title,auteurs,description,image,date,id,category);
-							}
-						}System.out.println("ITEM");
+									
+									sendBook(title,auteurs,description,image,date,id,category);
+								}else System.out.println("OUT");
+								System.out.println("WHYDBde");
+							}else System.out.println("volumeINfo");
+							System.out.println("WHYDBdede");
+						}else System.out.println("ITEM");
+						System.out.println("WHYDBdedazd");
 					}
-				}System.out.println("ARRAY");
+				}else System.out.println("ARRAY");
+				
+				System.out.println("WHYDBdedazaz");
 			}
 			else System.out.println("JS");
+			System.out.println("WHYDBdazze");
 		}
+		System.out.println("WHYDB");
     }
     
     public void addVideo (int num){
+    	System.out.println("VID");
     	while (DL(this.buildRequestMoviePopular(""+num))==1){
     		System.out.println("errreur");
 	    	try {
@@ -394,6 +394,7 @@ public class AddJson {
     }
     
     public void addMusic (String name){
+    	System.out.println("MUS");
     	while (DL(this.buildRequestMusique(name))!=0){
     		System.out.println("errreur");
 	    	try {

@@ -4,11 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,29 +16,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class FicheDoc {
-	private JFrame jf;
+	protected JFrame jf;
 	protected JPanel panel;
 	protected JLabel labelTitre;
-	private JPanel panelTitre;
+	protected JPanel panelTitre;
 	protected JTextArea labelDescription;
 	protected JLabel labelImage;
-	private JPanel panelAuteur;
-	private JPanel panelDescription;
-	private JPanel panelExemplaire;
-	private JLabel labelNbExemplaire;
-	private JLabel labelNbEmprunt;
-	private JPanel panelCommun;
-	private JLabel labelAuteur;
+	protected JPanel panelAuteur;
+	protected JPanel panelDescription;
+	protected JPanel panelExemplaire;
+	protected JLabel labelNbExemplaire;
+	protected JLabel labelNbEmprunt;
+	protected JPanel panelCommun;
+	protected JTextArea labelAuteur;
 	private JScrollPane scrollDescription;
-	private JPanel panelAuteurplusImage;
-	private JPanel panelImage;
+	protected JPanel panelAuteurplusImage;
+	protected JPanel panelImage;
 	protected String image;
 	protected String auteur;
 	protected String description;
 	protected String titre; 
 	
 	public FicheDoc (int Id){
-		
+		System.out.println("new fiche DOC");
 		
 		
 	}
@@ -66,7 +61,7 @@ public class FicheDoc {
 		labelDescription = new JTextArea("Description");
 		labelNbExemplaire = new JLabel ("Nb Exemplaire");
 		labelNbEmprunt    = new JLabel ("Nb Emprunt" );
-		labelAuteur = new JLabel ("Auteur ");
+		//labelAuteur = new JLabel ("Auteur ");
 		//scrollDescription = new JScrollPane (labelDescription);
 		//scrollDescription.setPreferredSize(new Dimension(400,200));
 		labelDescription.setLineWrap(true);
