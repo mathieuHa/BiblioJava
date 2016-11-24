@@ -585,7 +585,7 @@ public class Biblio implements ActionListener{
 					cpt++;
 					if (jb == arg0.getSource()){
 						System.out.println(lIntegerV.get(cpt-1).toString());
-						new FicheVid(lIntegerV.get(cpt-1).intValue());
+						new FicheVid(lIntegerV.get(cpt-1).intValue(),user);
 					}
 				}
 			}
@@ -605,7 +605,7 @@ public class Biblio implements ActionListener{
 					cpt++;
 					if (jb2 == arg0.getSource()){
 						System.out.println(lIntegerM.get(cpt-1).toString());
-						new FicheMusique(lIntegerM.get(cpt-1).intValue());
+						new FicheMusique(lIntegerM.get(cpt-1).intValue(),user);
 					}
 				}
 			}	

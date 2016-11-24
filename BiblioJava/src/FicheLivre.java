@@ -87,6 +87,7 @@ public class FicheLivre extends FicheDoc {
 		labelDescription.setLineWrap(true);
 		labelDescription.setWrapStyleWord(true);
 		labelDescription.setEditable(false);
+		//labelDescription.setMargin(new Insets (10,10,10,10));
 		//labelDescription.setPreferredSize(new Dimension(500,100));
 		labelDescription.setMinimumSize(new Dimension(540,30));
 		labelDescription.setColumns(32);
@@ -211,7 +212,7 @@ public class FicheLivre extends FicheDoc {
 		
 		panelSelect.setLayout(new BoxLayout(panelSelect,BoxLayout.X_AXIS));
 		
-		priceSelect = new JLabel ("Price " + tarif + "/semaine  Total : 0");
+		priceSelect = new JLabel ("Price " + tarif + "Crédit/Semaine  Total : 0 Crédits");
 		dureeSelect = new JLabel ("Durée : ");
 		panelSelect.add(Box.createHorizontalStrut(50));
 		panelSelect.add(dureeSelect);
@@ -234,7 +235,7 @@ public class FicheLivre extends FicheDoc {
 			panelDispo.add(labelDisIKO);
 			buttonAjouter.setEnabled(false);
 		}
-		
+		buttonAjouter.setEnabled(false);
 		
 		panelBot.add(panelDispo);
 		panelBot.add(panelSelect);
@@ -259,7 +260,7 @@ public class FicheLivre extends FicheDoc {
 			System.out.println("ActionListener : action sur " + comboTime.getSelectedItem());
 			priceSelect.setText("Price " + tarif + "/semaine  Total : " + (int)(comboTime.getSelectedItem()) * tarif);
 			buttonAjouter.setText("Emprunter pour " + comboTime.getSelectedItem() + " semaine");
-			if (Jeton <= (int)(comboTime.getSelectedItem()) * tarif){
+			if (Jeton <= (int)(comboTime.getSelectedItem()) * tarif || (int)comboTime.getSelectedItem()==0){
 				buttonAjouter.setEnabled(false);
 			}
 			else if (exmplaireDispo > 0){
@@ -268,7 +269,7 @@ public class FicheLivre extends FicheDoc {
 		}               
 	  }
 	
-	class ItemState implements ItemListener{
+	private class ItemState implements ItemListener{
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
 			// TODO Auto-generated method stub
