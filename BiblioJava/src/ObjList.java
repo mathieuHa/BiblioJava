@@ -7,7 +7,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -21,48 +20,30 @@ import javax.swing.SwingWorker;
 
 public class ObjList {
 	private JPanel obj;
-	
 	private JLabel labelauteur;
 	private JLabel labeltitle;
-	private JLabel labelduree;
-
 	private JLabel NbE;
-
 	private JButton buttonVP;
-
 	private JLabel labelannee;
-
 	private JLabel labelcategory;
-
 	private JLabel labelnote;
-
 	private JLabel labeldescription;
-
 	private JLabel labelimage;
-
 	private JLabel labeldateEmprunt;
-
 	private JLabel labeldateFin;
-
 	private JLabel labeltype;
-
 	private JLabel labelTimer;
-	private String dateF;
 	private SwingWorker<Object, Object> sw; 
 	private boolean cancel = false;
-
 	private String bd;
-
 	private String id;
+	
 	public void Sstart (String dateF){
-		this.dateF = dateF;
 		sw = new SwingWorker<Object, Object>(){
-
 			@Override
 			protected Object doInBackground() throws Exception {
-				// TODO Auto-generated method stub
 				while (cancel == false){
-					Thread.sleep(1000);
+					Thread.sleep(100);
 					labelTimer.setText(Biblio.compteur(dateF));
 					labelTimer.updateUI();
 				}
@@ -72,45 +53,8 @@ public class ObjList {
 		sw.execute();
 	}
 	
-	
-	
-	
-	
-	public boolean isCancel() {
-		return cancel;
-	}
-
-
-
-
-
-	public void setCancel(boolean cancel) {
-		this.cancel = cancel;
-	}
-
-
-
-
-
-	public SwingWorker<Object, Object> getSw() {
-		return sw;
-	}
-
-
-
-
-
-	public void setSw(SwingWorker<Object, Object> sw) {
-		this.sw = sw;
-	}
-
-
-
-
-
 	public ObjList() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void updateTitre (ArrayList<ObjList> objL) {
@@ -138,17 +82,7 @@ public class ObjList {
 		
 	}
 
-	public JLabel getLabeltitle() {
-		return labeltitle;
-	}
-
-
-
-
-
-	public void setLabeltitle(JLabel labeltitle) {
-		this.labeltitle = labeltitle;
-	}
+	
 
 
 
@@ -185,36 +119,7 @@ public class ObjList {
 	}
 	
 
-	public String getBd() {
-		return bd;
-	}
-
-
-
-
-
-	public void setBd(String bd) {
-		this.bd = bd;
-	}
-
-
-
-
-
-	public String getId() {
-		return id;
-	}
-
-
-
-
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-
-
+	
 
 
 	public ObjList (String titre, String auteur, String annee, String category,String image, int nbExemplaire, JPanel Pane, int width)
@@ -258,13 +163,7 @@ public class ObjList {
 		System.out.println("ici");
 	}
 	
-	public JButton getButtonVP() {
-		return buttonVP;
-	}
-
-	public void setButtonVP(JButton buttonVP) {
-		this.buttonVP = buttonVP;
-	}
+	
 
 	public JPanel helpVideo(int width, JButton bouton)
 	{
@@ -293,7 +192,6 @@ public class ObjList {
 		obj.add(NbE);
 		obj.add(Box.createHorizontalStrut(width/7-(int)NbE.getPreferredSize().getWidth()));
 		obj.add(bouton);
-		//System.out.println("ici");
 		return obj;
 	}
 	
@@ -319,8 +217,6 @@ public class ObjList {
 		obj.add(Box.createHorizontalStrut(width/7-(int)NbE.getPreferredSize().getWidth()));
 		obj.add(Box.createHorizontalStrut(width/7));
 		obj.add(bouton);
-		//obj.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		//System.out.println("ici");
 		return obj;
 	}
 	
@@ -348,13 +244,25 @@ public class ObjList {
 		obj.add(Box.createHorizontalStrut(width/7-(int)labelcategory.getPreferredSize().getWidth()));
 		obj.add(NbE);
 		obj.add(Box.createHorizontalStrut(width/7-(int)NbE.getPreferredSize().getWidth()));
-		//obj.add(Box.createHorizontalStrut(width/6));
 		obj.add(bouton);
-		//obj.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		//System.out.println("ici");
 		return obj;
 	}
 	
+	public JLabel getLabeltitle() {
+		return labeltitle;
+	}
+
+	public void setLabeltitle(JLabel labeltitle) {
+		this.labeltitle = labeltitle;
+	}
+	
+	public JButton getButtonVP() {
+		return buttonVP;
+	}
+
+	public void setButtonVP(JButton buttonVP) {
+		this.buttonVP = buttonVP;
+	}
 	
 	public JPanel getObj() {
 		return obj;
@@ -363,13 +271,59 @@ public class ObjList {
 		this.obj = obj;
 	}
 
-
 	public JLabel getLabelTimer() {
 		return labelTimer;
 	}
 
-
 	public void setLabelTimer(JLabel labelTimer) {
 		this.labelTimer = labelTimer;
 	}
+	
+	public boolean isCancel() {
+		return cancel;
+	}
+
+	public void setCancel(boolean cancel) {
+		this.cancel = cancel;
+	}
+	
+	public SwingWorker<Object, Object> getSw() {
+		return sw;
+	}
+
+	public void setSw(SwingWorker<Object, Object> sw) {
+		this.sw = sw;
+	}
+	
+	public String getBd() {
+		return bd;
+	}
+
+
+
+
+
+	public void setBd(String bd) {
+		this.bd = bd;
+	}
+
+
+
+
+
+	public String getId() {
+		return id;
+	}
+
+
+
+
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+
+
+
 }

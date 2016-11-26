@@ -83,4 +83,61 @@ public class SqlHelper {
 		return "";
 	}
 	
+	public void createTable () {
+	    this.connect();
+        String sqllogin = "CREATE TABLE LOGIN " +
+              "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+              " USERNAME           TEXT    NOT NULL, " + 
+              " CREDIT             INT     NOT NULL, " + 
+              " PASSWORD           TEXT    NOT NULL)";
+        String sqlvideo = "CREATE TABLE VIDEO " +
+              "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+              " TITRE              TEXT    NOT NULL, " +
+              " ANNEE              TEXT    NOT NULL, " +
+              " IMAGE              TEXT    NOT NULL, " +
+              " DESCRIPTION        TEXT    NOT NULL, " +
+              " LANGUAGE           TEXT    NOT NULL, " +
+              " NBEMPRUNT          INT     NOT NULL, " +
+              " NBEXEMPLAIRE       INT     NOT NULL, " +
+              " NOTE               TEXT    NOT NULL, " +
+              " TARIF		       INT     NOT NULL) ";
+      
+        String sqlaudio = "CREATE TABLE AUDIO " +
+              "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+              " TITRE              TEXT    NOT NULL, " +
+              " AUTEUR             TEXT    NOT NULL, " +
+              " ALBUM              TEXT    NOT NULL, " +
+              " IMAGE              TEXT    NOT NULL, " +
+              " NBEMPRUNT          INT     NOT NULL, " +
+              " NBEXEMPLAIRE       INT     NOT NULL, " +
+              " TARIF		       INT     NOT NULL) ";
+      
+        String sqlfiche = "CREATE TABLE FICHE " +
+              "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+              " USERID             INT     NOT NULL, " + 
+              " DOCID              INT     NOT NULL, " +
+              " TYPEDOC            TEXT     NOT NULL, " +
+              " DATEEMPRUNT        TEXT    NOT NULL, " +
+              " DATEFIN            TEXT    NOT NULL)  ";
+      
+      
+        String sqllivre = "CREATE TABLE LIVRE " +
+              "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
+              " TITRE              TEXT    NOT NULL, " +
+              " AUTEUR             TEXT    NOT NULL, " +
+              " ANNEE              TEXT    NOT NULL, " +
+              " CATEGORY           TEXT    NOT NULL, " +
+              " IMAGE              TEXT    NOT NULL, " +
+              " NBEMPRUNT          INT     NOT NULL, " +
+              " NBEXEMPLAIRE       INT     NOT NULL, " +
+              " DESCRIPTION        TEXT    NOT NULL, " +
+              " TARIF		       INT     NOT NULL) ";
+	      
+	     this.updatesql(sqllivre);
+	     this.updatesql(sqlfiche);
+	     this.updatesql(sqlaudio);
+	     this.updatesql(sqlvideo);
+	     this.updatesql(sqllogin);
+	}
+	
 }

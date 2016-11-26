@@ -59,21 +59,28 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 	private int docId;
 	private User user;
 	private JComboBox<String> comboDay;
+	
+	public void setupFrame () {
+		jf = new JFrame ();
+		jf.setTitle("Détail Article");
+		jf.setMinimumSize(new Dimension(600,800));
+		jf.setResizable(false);
+		jf.setVisible(true);
+	}
 	public FicheLivre(int Id, User user) {
 		super(Id);
 		docId = Id;
 		this.user = user;
 		Jeton = user.getCredit();
 		req(Id);
-		jf = new JFrame ();
-		jf.setTitle("Détail Article");
-		jf.setMinimumSize(new Dimension(600,800));
-		jf.setResizable(false);
-		jf.setVisible(true);
-		setPanel(new JPanel(new BorderLayout()));
+		
+		setupFrame ();
+		
+		panel = new JPanel(new BorderLayout());
 		panelTitre = new JPanel();
 		panelAuteur = new JPanel ();
 		panelDescription = new JPanel ();
+		
 		panelExemplaire = new JPanel ();
 		panelExemplaire.setLayout(new BoxLayout(panelExemplaire,BoxLayout.X_AXIS));
 		
@@ -84,22 +91,17 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 		labelNbExemplaire = new JLabel ("Nb Exemplaire");
 		labelNbEmprunt    = new JLabel ("Nb Emprunt" );
 		
-		//scrollDescription = new JScrollPane (labelDescription);
-		//scrollDescription.setPreferredSize(new Dimension(400,200));
 		labelResume = new JLabel( "Résumé :");
 		labelDescription = new JTextArea("Description");
 		labelDescription.setFont(new Font(labelDescription.getFont().getFontName(),labelDescription.getFont().getStyle(),14));
 		labelDescription.setLineWrap(true);
 		labelDescription.setWrapStyleWord(true);
 		labelDescription.setEditable(false);
-		//labelDescription.setMargin(new Insets (10,10,10,10));
-		//labelDescription.setPreferredSize(new Dimension(500,100));
 		labelDescription.setMinimumSize(new Dimension(540,30));
 		labelDescription.setColumns(32);
 		labelDescription.setMaximumSize(new Dimension(540,100));
 		
 		labelDescription.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2, true));
-		//req(Id);
 		panelTitre.add(labelTitre);
 		panelTitre.setBackground(Color.CYAN);
 		panelExemplaire.add(Box.createHorizontalStrut(30));
@@ -108,24 +110,19 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 		panelExemplaire.add(labelNbEmprunt);
 		panelExemplaire.add(Box.createHorizontalGlue());
 		
-		
 		try {
 			labelImage = new JLabel( (Icon) new ImageIcon( new URL(image) ) );
 		} catch (MalformedURLException e) {
 			labelImage = new JLabel("erreur");
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//labelImage.setMinimumSize(new Dimension(120,150));
 		labelTitre.setText(titre);
 		labelDescription.setText(description);
-		//labelAuteur.setText(auteur);
 		
 		panelImage = new JPanel();
 		panelImage.add(labelImage);
 		
 		panelDescription.setLayout(new BoxLayout(panelDescription,BoxLayout.Y_AXIS));
-		//panelDescription.add(Box.createVerticalStrut(10));
 		panelDescription.add(labelResume);
 		panelDescription.add(Box.createVerticalStrut(5));
 		panelDescription.add(labelDescription);
@@ -147,8 +144,6 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 		labelCategory.setFont(new Font(labelCategory.getFont().getFontName(),Font.ITALIC,16));
 		labelCategory.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		
-		
-		
 		panelDate = new JPanel();
 		panelDate.setLayout(new BoxLayout(panelDate, BoxLayout.X_AXIS));
 		panelDate.add(Box.createHorizontalStrut(20));
@@ -164,17 +159,13 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 		labelAuteur.setFont(new Font(labelAuteur.getFont().getFontName(),labelAuteur.getFont().getStyle(),16));
 		labelAuteur.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		panelAuteur.setLayout(new BoxLayout(panelAuteur,BoxLayout.Y_AXIS));
-		//panelAuteur.add(Box.createVerticalStrut(2));
 		panelAuteur.add(panelDate);
 		panelAuteur.add(labelCat);
 		panelAuteur.add(labelCategory);
-		//panelAuteur.add(panelCategory);
-		//panelAuteur.add(Box.createHorizontalStrut(2));
 		panelAuteur.add(labelAut);
 		panelAuteur.add(Box.createVerticalStrut(5));
 		panelAuteur.add(labelAuteur);
 		panelAuteur.add(Box.createHorizontalStrut(10));
-		//panelAuteur.add(Box.createVerticalGlue());
 		panelCommun = new JPanel(new GridLayout(3,1));
 		
 		panelAuteurplusImage = new JPanel ();
@@ -269,15 +260,9 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 		panelBot.add(buttonAjouter);
 		panelCommun.add(panelBot);
 		
-		
-		
-		
 		getPanel().add(panelTitre,BorderLayout.NORTH);
 		getPanel().add(panelCommun,BorderLayout.CENTER);
-		//panel.add(labelImage,BorderLayout.SOUTH);
 		jf.add(getPanel());
-		//super.addUI();
-		// TODO Auto-generated constructor stub
 	}
 	
 	class ItemAction implements ActionListener{
@@ -329,14 +314,12 @@ public class FicheLivre extends FicheDoc implements ActionListener{
 	        stmt.close();
 		    connexion.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	      
 	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource()==buttonAjouter) {
 			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "LIVRE", (comboWeek.getSelectedItem().toString().charAt(0)-'0') * tarif);
 			jf.dispose();

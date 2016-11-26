@@ -119,7 +119,6 @@ public class Biblio implements ActionListener{
 	private ResultSet rs;
 	
 	public Biblio () {
-		//create_table();
 		fill_tables();
 	    connection ();
 	    lButtonV = new ArrayList<JButton>();
@@ -135,21 +134,7 @@ public class Biblio implements ActionListener{
 		System.out.println("OK");
 	}
 
-	public ArrayList<User> getListUser() {
-		return listUser;
-	}
-
-	public void setListUser(ArrayList<User> listUser) {
-		this.listUser = listUser;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
+	
 	
 	public void connection () {
 		autentification = new Autentification();
@@ -174,148 +159,184 @@ public class Biblio implements ActionListener{
 	          }
 	        }         
 	      };
-	      //On lance le SwingWorker
 	      sw.execute();
 	}
 	
 	public void fill_tables (){
-		try {
-		      Class.forName("org.sqlite.JDBC");
-		      connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database successfully creat table");
-		      stmt = connexion.createStatement();
-		      String sqlaudiorequest = "UPDATE AUDIO SET NBEXEMPLAIRE = 2";
-		      String sqlvideorequest = "UPDATE VIDEO SET NBEXEMPLAIRE = 2";
-		      String sqllivrerequest = "UPDATE LIVRE SET NBEXEMPLAIRE = 2";
-		      String sqlaudiorequest1 = "UPDATE AUDIO SET TARIF = 1";
-		      String sqlvideorequest1 = "UPDATE VIDEO SET TARIF = 3";
-		      String sqllivrerequest1 = "UPDATE LIVRE SET TARIF = 2";
-		      
-		      stmt.executeUpdate(sqlvideorequest);
-		      stmt.executeUpdate(sqlaudiorequest);
-		      stmt.executeUpdate(sqllivrerequest);
-		      stmt.executeUpdate(sqlvideorequest1);
-		      stmt.executeUpdate(sqlaudiorequest1);
-		      stmt.executeUpdate(sqllivrerequest1);
-		      stmt.close();
-		      connexion.close();
-		      
-		    } catch ( Exception e ) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
-		    }
+		sqlHelper.connect();
+		String sqlaudiorequest = "UPDATE AUDIO SET NBEXEMPLAIRE = 2";
+		String sqlvideorequest = "UPDATE VIDEO SET NBEXEMPLAIRE = 2";
+		String sqllivrerequest = "UPDATE LIVRE SET NBEXEMPLAIRE = 2";
+		String sqlaudiorequest1 = "UPDATE AUDIO SET TARIF = 1";
+		String sqlvideorequest1 = "UPDATE VIDEO SET TARIF = 3";
+		String sqllivrerequest1 = "UPDATE LIVRE SET TARIF = 2";
+		sqlHelper.updatesql(sqllivrerequest1);
+		sqlHelper.updatesql(sqllivrerequest);
+		sqlHelper.updatesql(sqlaudiorequest1);
+		sqlHelper.updatesql(sqlaudiorequest1);
+		sqlHelper.updatesql(sqlvideorequest1);
+		sqlHelper.updatesql(sqlvideorequest1);
+		sqlHelper.disconnect();
 	}
 	
-	public void create_table () {
-		connexion = null;
-	    try {
-	      Class.forName("org.sqlite.JDBC");
-	      connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-	      System.out.println("Opened database successfully creat table");
-	      stmt = connexion.createStatement();
-	      String sqllogin = "CREATE TABLE LOGIN " +
-                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " USERNAME           TEXT    NOT NULL, " + 
-                  " CREDIT             INT     NOT NULL, " + 
-                  " PASSWORD           TEXT    NOT NULL)";
-	      String sqlvideo = "CREATE TABLE VIDEO " +
-                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " TITRE              TEXT    NOT NULL, " +
-                  " ANNEE              TEXT    NOT NULL, " +
-                  " IMAGE              TEXT    NOT NULL, " +
-                  " DESCRIPTION        TEXT    NOT NULL, " +
-                  " LANGUAGE           TEXT    NOT NULL, " +
-                  " NBEMPRUNT          INT     NOT NULL, " +
-                  " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " NOTE               TEXT    NOT NULL, " +
-                  " TARIF		       INT     NOT NULL) ";
-	      
-	      String sqlaudio = "CREATE TABLE AUDIO " +
-                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " TITRE              TEXT    NOT NULL, " +
-                  " AUTEUR             TEXT    NOT NULL, " +
-                  " ALBUM              TEXT    NOT NULL, " +
-                  " IMAGE              TEXT    NOT NULL, " +
-                  " NBEMPRUNT          INT     NOT NULL, " +
-                  " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " TARIF		       INT     NOT NULL) ";
-	      
-	      String sqlfiche = "CREATE TABLE FICHE " +
-                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " USERID             INT     NOT NULL, " + 
-                  " DOCID              INT     NOT NULL, " +
-                  " TYPEDOC            TEXT     NOT NULL, " +
-                  " DATEEMPRUNT        TEXT    NOT NULL, " +
-                  " DATEFIN            TEXT    NOT NULL)  ";
-          
-	      
-	      String sqllivre = "CREATE TABLE LIVRE " +
-                  "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
-                  " TITRE              TEXT    NOT NULL, " +
-                  " AUTEUR             TEXT    NOT NULL, " +
-                  " ANNEE              TEXT    NOT NULL, " +
-                  " CATEGORY           TEXT    NOT NULL, " +
-                  " IMAGE              TEXT    NOT NULL, " +
-                  " NBEMPRUNT          INT     NOT NULL, " +
-                  " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " DESCRIPTION        TEXT    NOT NULL, " +
-                  " TARIF		       INT     NOT NULL) ";
-	      
-	      stmt.executeUpdate(sqllogin);
-	      stmt.executeUpdate(sqlfiche);
-	      stmt.executeUpdate(sqlvideo);
-	      stmt.executeUpdate(sqlaudio);
-	      stmt.executeUpdate(sqllivre);
-	      stmt.close();
-	      connexion.close();
-	      
-	    } catch ( Exception e ) {
-	      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-	      System.exit(0);
-	    }
-	    user = new User();
-	    
-		System.out.println("OK");
-	}
-	
-	public void afficheLibrairy (){
+	private void setupFrameUI () {
 		frame = new JFrame ("LibraryGUI");
 		frame.setMinimumSize(new Dimension(1200,800));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLayout(new BorderLayout());
-		
 		cl = new CardLayout();
-		
 		panelbouton = new JPanel();
 		panelbouton.setBackground(Color.gray);	
-		panelAddmin = new JPanel ();
-		panelAddmin.setBackground(Color.darkGray);	
-		
-		textAreaResultMusique = new JTextArea();
-		scrollMusique = new JScrollPane(textAreaResultMusique);
-		textAreaResultFilm = new JTextArea();
-		scrollFilm = new JScrollPane(textAreaResultFilm);
-		textAreaResultLivre = new JTextArea();
-		scrollLivre = new JScrollPane(textAreaResultLivre);
-		
+	    obj = new ObjList();
+	    panelbouton.add(boutonCompte);
+	    panelbouton.add(boutonMusique);
+	    panelbouton.add(boutonLivre);
+	    panelbouton.add(boutonVideo);
+	    
+	    panel = new JPanel();
+	    panel.setLayout(cl);
+	    
+	    
+	    
+	    frame.add(panelbouton, BorderLayout.NORTH);
+	    frame.add(panel, BorderLayout.CENTER);
+		frame.setVisible(true);
+
+	}
+	
+	private void setupFilmUI () {
 		panelfilms = new JPanel();
 		panelfilmsSearch = new JPanel();
 	    panelfilms.setBackground(Color.pink);	
 	    panelfilms.setLayout(new BorderLayout());
+	    
+	    textAreaResultFilm = new JTextArea();
+		scrollFilm = new JScrollPane(textAreaResultFilm);
+		
+		boutonVideo = new JButton("Video");
+		boutonVideo.addActionListener(this);
+		boutonOKVideo = new JButton("ok");
+		boutonOKVideo.addActionListener(this);
+		
+		jtfFilm = new JTextField();
+	    jtfFilm.setPreferredSize(new Dimension(300, 30));
+	    
+	    jlbFilm = new JLabel   ("Recherche    Film");
+	    
+	    panelfilmsSearch.add(jlbFilm);
+	    panelfilmsSearch.add(jtfFilm);
+	    panelfilmsSearch.add(boutonOKVideo);
+	    
+	    panelfilms.add(panelfilmsSearch,BorderLayout.NORTH);
+	    
+	    panelfilmResult = new JPanel(new GridLayout(6,1));
+	    panelfilmResult.setMaximumSize(new Dimension(600,300));
+	    panelfilmResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    boutonfilmReset = new JButton("ici");
+	    boutonfilmReset.addActionListener(this);
+	    
+	    panelfilmhelp = obj.helpVideo(frame.getWidth()-100,boutonfilmReset); 
+	    
+	    panelfilmResult.add(panelfilmhelp);
+	    panelfilms.add(panelfilmResult,BorderLayout.CENTER);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	}
+	
+	private void setupLivreUI () {
+		panellivre = new JPanel();
+	    panellivre.setBackground(Color.green);
+	    panellivre.setLayout(new BorderLayout());
+	    
+	    panellivreSearch = new JPanel();
+	    panelfilmsSearch.setBackground(Color.lightGray);
+	    
+	    textAreaResultLivre = new JTextArea();
+		scrollLivre = new JScrollPane(textAreaResultLivre);
+		
+		boutonLivre = new JButton("Livre");
+		boutonLivre.addActionListener(this);
+		boutonOKLivre = new JButton("ok");
+		boutonOKLivre.addActionListener(this);
+		
+		jtfLivre = new JTextField();
+		jtfLivre.setPreferredSize(new Dimension(300, 30));
+		
+		jlbLivre = new JLabel  ("Recherche   Livre");
+		
+		panellivreSearch.add(jlbLivre);
+		panellivreSearch.add(jtfLivre);
+		panellivreSearch.add(boutonOKLivre);
+		
+		panellivre.add(panellivreSearch,BorderLayout.NORTH);
+		
+		panellivreResult = new JPanel(new GridLayout(6,1));
+	    panellivreResult.setMaximumSize(new Dimension(600,300));
+	    panellivreResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    boutonlivreReset = new JButton("ici");
+	    boutonlivreReset.addActionListener(this);
+	    
+	    panellivrehelp = obj.helpLivre(frame.getWidth()-100,boutonlivreReset); 
+	    
+	    panellivreResult.add(panellivrehelp);
+	    panellivre.add(panellivreResult,BorderLayout.CENTER);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	    
+	    
+	}
+	
+	private void setupMusiqueUI() {
+		panelmusique = new JPanel();
+		panelmusique.setBackground(Color.red);	
+	    panelmusique.setLayout(new BorderLayout());
+	    
+	    panelmusiqueSearch = new JPanel();
+		textAreaResultMusique = new JTextArea();
+		scrollMusique = new JScrollPane(textAreaResultMusique);
+		
+		boutonMusique = new JButton("Musique");
+		boutonMusique.addActionListener(this);
+		boutonOKMusique = new JButton("ok");
+		boutonOKMusique.addActionListener(this);
+		
+		jtfMusique = new JTextField();
+		jtfMusique.setPreferredSize(new Dimension(300, 30));
+		
+		jlbMusique = new JLabel("Recherche Musique");
+		
+		panelmusiqueSearch.add(jlbMusique);
+		panelmusiqueSearch.add(jtfMusique);
+		panelmusiqueSearch.add(boutonOKMusique);
+		
+		panelmusique.add(panelmusiqueSearch,BorderLayout.NORTH);
+		
+		panelmusiqueResult = new JPanel(new GridLayout(6,1));
+	    panelmusiqueResult.setMaximumSize(new Dimension(600,300));
+	    panelmusiqueResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+	    
+	    boutonmusiqueReset = new JButton("ici");
+	    boutonmusiqueReset.addActionListener(this);
+	    
+	    panelmusiquehelp = obj.helpMusique(frame.getWidth()-100,boutonmusiqueReset); 
+	    
+	    panelmusiqueResult.add(panelmusiquehelp);
+	    panelmusique.add(panelmusiqueResult,BorderLayout.CENTER);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
+	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
+	}
+	
+	private void setupCompteUI() {
 		panelcompte = new JPanel();
 		panelcompteAdd = new JPanel();
 	    panelcompte.setBackground(Color.blue);	
 	    panelcompte.setLayout(new BorderLayout());
-	    panelmusique = new JPanel();
-	    panelmusiqueSearch = new JPanel();
-	    panelfilmsSearch.setBackground(Color.lightGray);
-	    panelmusique.setBackground(Color.red);	
-	    panelmusique.setLayout(new BorderLayout());
-	    panellivre = new JPanel();
-	    panellivreSearch = new JPanel();
-	    panellivre.setBackground(Color.green);
-	    panellivre.setLayout(new BorderLayout());
 	    
 	    boutonCompteAddMusique = new JButton("Add Musique");
 	    boutonCompteAddMusique.addActionListener(this);
@@ -323,6 +344,9 @@ public class Biblio implements ActionListener{
 	    boutonCompteAddLivre.addActionListener(this);
 	    boutonCompteAddVideo = new JButton("Add Video");
 	    boutonCompteAddVideo.addActionListener(this);
+	    
+	    panelAddmin = new JPanel ();
+		panelAddmin.setBackground(Color.darkGray);	
 	    
 	    panelAddmin.setLayout(new BoxLayout(panelAddmin,BoxLayout.X_AXIS));
 	    panelAddmin.add(Box.createHorizontalGlue());
@@ -334,127 +358,35 @@ public class Biblio implements ActionListener{
 	    panelAddmin.add(Box.createHorizontalGlue());
 	    
 	    panelFiches = new JPanel (new GridLayout(10,1));
+	    
+	    panelFicheVoir = new JPanel();
 	    labelMesFiches = new JLabel ("Mes Fiches");
 	    labelMesFiches.setFont(new Font(labelMesFiches.getFont().getFontName(),Font.ROMAN_BASELINE,20));
-	    panelFicheVoir = new JPanel();
 	    panelFicheVoir.add(labelMesFiches);
-	    
-	    
-	    
-	    panelFiches.add(panelFicheVoir);
-	    
+	    panelFiches.add(panelFicheVoir);    
 	    
 	    boutonCompte = new JButton("Compte");
-	    boutonVideo = new JButton("Video");
-	    boutonMusique = new JButton("Musique");
-	    boutonLivre = new JButton("Livre");
-	    
-	    boutonOKVideo = new JButton("ok");
-	    boutonOKLivre = new JButton("ok");
-	    boutonOKMusique = new JButton("ok");
-	    
 	    boutonCompte.addActionListener(this);
-	    boutonMusique.addActionListener(this);
-	    boutonLivre.addActionListener(this);
-	    boutonVideo.addActionListener(this);
-	    
-	    boutonOKVideo.addActionListener(this);
-	    boutonOKMusique.addActionListener(this);
-	    boutonOKLivre.addActionListener(this);
-	    
-	    jtfLivre = new JTextField();
-	    jtfMusique = new JTextField();
-	    jtfFilm = new JTextField();
-	    jtfLivre.setPreferredSize(new Dimension(300, 30));
-	    jtfFilm.setPreferredSize(new Dimension(300, 30));
-	    jtfMusique.setPreferredSize(new Dimension(300, 30));
-	    
-	    jlbLivre = new JLabel  ("Recherche  Livre");
-	    jlbFilm = new JLabel   ("Recherche   Film");
-	    jlbMusique = new JLabel("Recherche Musique");
-	    
-	    panelmusiqueSearch.add(jlbMusique);
-	    panellivreSearch.add(jlbLivre);
-	    panelfilmsSearch.add(jlbFilm);
-	    
-	    panelmusiqueSearch.add(jtfMusique);
-	    panellivreSearch.add(jtfLivre);
-	    panelfilmsSearch.add(jtfFilm);
-	    
-	    panelmusiqueSearch.add(boutonOKMusique);
-	    panellivreSearch.add(boutonOKLivre);
-	    panelfilmsSearch.add(boutonOKVideo);
-	    
-	    panelmusique.add(panelmusiqueSearch,BorderLayout.NORTH);
-	    panellivre.add(panellivreSearch,BorderLayout.NORTH);
-	    panelfilms.add(panelfilmsSearch,BorderLayout.NORTH);
-	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
-	    
-	    panelfilmResult = new JPanel(new GridLayout(6,1));
-	    panelfilmResult.setMaximumSize(new Dimension(600,300));
-	    panelfilmResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-	    
-	    panelmusiqueResult = new JPanel(new GridLayout(6,1));
-	    panelmusiqueResult.setMaximumSize(new Dimension(600,300));
-	    panelmusiqueResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-	    
-	    panellivreResult = new JPanel(new GridLayout(6,1));
-	    panellivreResult.setMaximumSize(new Dimension(600,300));
-	    panellivreResult.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-	    
-	    obj = new ObjList();
-	    boutonfilmReset = new JButton("ici");
-	    boutonfilmReset.addActionListener(this);
-	    boutonlivreReset = new JButton("ici");
-	    boutonlivreReset.addActionListener(this);
-	    boutonmusiqueReset = new JButton("ici");
-	    boutonmusiqueReset.addActionListener(this);
-	    panelfilmhelp = obj.helpVideo(frame.getWidth()-100,boutonfilmReset); 
-	    panelmusiquehelp = obj.helpMusique(frame.getWidth()-100,boutonmusiqueReset); 
-	    panellivrehelp = obj.helpLivre(frame.getWidth()-100,boutonlivreReset); 
-	    
-	    
-	    panelfilmResult.add(panelfilmhelp);
-	    panelfilms.add(panelfilmResult,BorderLayout.CENTER);
-	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
-	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
-	    panelfilms.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
-	    
-	    panelmusiqueResult.add(panelmusiquehelp);
-	    panelmusique.add(panelmusiqueResult,BorderLayout.CENTER);
-	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
-	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
-	    panelmusique.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
-	    
-	    panellivreResult.add(panellivrehelp);
-	    panellivre.add(panellivreResult,BorderLayout.CENTER);
-	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.EAST);
-	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
-	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
 	    
 	    panelcompte.add(panelFiches,BorderLayout.CENTER);
 	    
-	    //panelfilms.add(scrollFilm,BorderLayout.CENTER);
-	    //panelmusique.add(scrollMusique);
-	    //panellivre.add(scrollLivre);
-	    
-	    panelbouton.add(boutonCompte);
-	    panelbouton.add(boutonMusique);
-	    panelbouton.add(boutonLivre);
-	    panelbouton.add(boutonVideo);
-	    
-	    panel = new JPanel();
-	    panel.setLayout(cl);
-	    
-	    panel.add(panelcompte, "compte");
+	}
+	
+	private void finishFrameUI(){
+		panel.add(panelcompte, "compte");
 	    panel.add(panellivre, "livre");
 	    panel.add(panelmusique, "musique");
 	    panel.add(panelfilms, "video");
+	}
+	 
+	public void afficheLibrairy (){
+		setupFrameUI();
+		setupFilmUI();
+		setupLivreUI();
+		setupMusiqueUI();
+		setupCompteUI();
+		finishFrameUI();
 	    
-	    frame.add(panelbouton, BorderLayout.NORTH);
-	    frame.add(panel, BorderLayout.CENTER);
-		frame.setVisible(true);
-
 		UpdateDataBase updb = new UpdateDataBase();
 		
 		//AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY
@@ -636,8 +568,6 @@ public class Biblio implements ActionListener{
 			String  s = rs.getString(str);
 			return str.toUpperCase() + " = " + s;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
 			e.printStackTrace();
 		}
 		return null;
@@ -650,5 +580,21 @@ public class Biblio implements ActionListener{
 		pane.add(Box.createHorizontalStrut(30));
 		pane.add(Box.createVerticalStrut(30));
 		return pane;
+	}
+	
+	public ArrayList<User> getListUser() {
+		return listUser;
+	}
+
+	public void setListUser(ArrayList<User> listUser) {
+		this.listUser = listUser;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

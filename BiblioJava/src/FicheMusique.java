@@ -62,6 +62,7 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 	private int docId;
 	private JComboBox<String> comboWeek;
 	private JComboBox<String> comboDay;
+	private SqlHelper sqlHelper = new SqlHelper();
 	public FicheMusique(int Id, User user) {
 		super(Id);
 		this.user = user;
@@ -87,10 +88,6 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		labelNbExemplaire = new JLabel ("Nb Exemplaire");
 		labelNbEmprunt    = new JLabel ("Nb Emprunt" );
 		
-		//scrollDescription = new JScrollPane (labelDescription);
-		//scrollDescription.setPreferredSize(new Dimension(400,200));
-		
-		//req(Id);
 		panelTitre.add(labelTitre);
 		panelTitre.setBackground(Color.CYAN);
 		panelExemplaire.add(Box.createHorizontalStrut(30));
@@ -99,28 +96,16 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		panelExemplaire.add(labelNbEmprunt);
 		panelExemplaire.add(Box.createHorizontalGlue());
 		
-		
 		try {
 			labelImage = new JLabel( (Icon) new ImageIcon( new URL(image) ) );
 		} catch (MalformedURLException e) {
 			labelImage = new JLabel("erreur");
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//labelImage.setMinimumSize(new Dimension(120,150));
 		labelTitre.setText(titre);
-		//labelDescription.setText(description);
-		//labelAuteur.setText(auteur);
 		
 		panelImage = new JPanel();
 		panelImage.add(labelImage);
-		
-		//panelDescription.setLayout(new BoxLayout(panelDescription,BoxLayout.Y_AXIS));
-		//panelDescription.add(Box.createVerticalStrut(10));
-		//panelDescription.add(labelResume);
-		//panelDescription.add(Box.createVerticalStrut(5));
-		//panelDescription.add(labelDescription);
-		//panelDescription.add(Box.createVerticalStrut(10));
 		
 		labelAuteur = new JTextArea (auteur);
 		labelAut = new JLabel("Auteur :");
@@ -138,14 +123,6 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		labelAlbum.setFont(new Font(labelAlbum.getFont().getFontName(),Font.ITALIC,16));
 		labelAlbum.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		
-		
-		
-		/*panelDate = new JPanel();
-		panelDate.setLayout(new BoxLayout(panelDate, BoxLayout.X_AXIS));
-		panelDate.add(Box.createHorizontalStrut(20));
-		panelDate.add(labelAnne);
-		panelDate.add(Box.createHorizontalGlue());
-		*/
 		labelAuteur.setMinimumSize(new Dimension(150,20));
 		labelAuteur.setMaximumSize(new Dimension(150,100));
 		labelAuteur.setColumns(10);
@@ -156,16 +133,12 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		labelAuteur.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		panelAuteur.setLayout(new BoxLayout(panelAuteur,BoxLayout.Y_AXIS));
 		panelAuteur.add(Box.createVerticalGlue());
-		//panelAuteur.add(panelDate);
 		panelAuteur.add(labelAlb);
 		panelAuteur.add(labelAlbum);
 		panelAuteur.add(Box.createVerticalGlue());
-		//panelAuteur.add(panelCategory);
-		//panelAuteur.add(Box.createHorizontalStrut(2));
 		panelAuteur.add(labelAut);
 		panelAuteur.add(Box.createVerticalStrut(5));
 		panelAuteur.add(labelAuteur);
-		//panelAuteur.add(Box.createHorizontalStrut(10));
 		panelAuteur.add(Box.createVerticalGlue());
 		panelAuteur.add(Box.createVerticalGlue());
 		panelCommun = new JPanel(new GridLayout(3,1));
@@ -188,7 +161,6 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		
 		panelCommun.add(panelCenterAetI);
 		panelCommun.add(panelDescription);
-		//panelCommun.setBackground(Color.BLACK);
 		
 		panelBot = new JPanel();
 		panelBot.setLayout(new GridLayout(3,1));
@@ -262,24 +234,15 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 		panelBot.add(buttonAjouter);
 		panelCommun.add(panelBot);
 		
-		
-		
-		
 		getPanel().add(panelTitre,BorderLayout.NORTH);
 		getPanel().add(panelCommun,BorderLayout.CENTER);
-		//panel.add(labelImage,BorderLayout.SOUTH);
 		jf.add(getPanel());
-		//super.addUI();
-		// TODO Auto-generated constructor stub
 	}
 	
 	class ItemAction implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			System.out.println("ActionListener : action sur " + comboWeek.getSelectedItem());
-			
 			priceSelect.setText("Price Total : " + ((int)((comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif)) + " Crédits");
 			if (comboWeek.getSelectedItem().toString().charAt(0)!='0' && comboDay.getSelectedItem().toString().charAt(0)!='0')
 				buttonAjouter.setText("Emprunter pour " + comboWeek.getSelectedItem() + " et " +comboDay.getSelectedItem());
@@ -295,44 +258,29 @@ public class FicheMusique extends FicheDoc implements ActionListener{
 				buttonAjouter.setEnabled(true);
 			}
 		}               
-	  }
+	}
 	
 	private class ItemState implements ItemListener{
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
-			// TODO Auto-generated method stub
 			System.out.println("événement déclenché sur : " + arg0.getItem());
 		}               
 	  }
 	public void req (int Id){
 		String sqlsearch = "SELECT * FROM AUDIO where ID = " + Id;
-		 try {
-			Class.forName("org.sqlite.JDBC");
-			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-	        System.out.println("Opened database Video successfully");
-	        Statement stmt = connexion.createStatement();
-	        ResultSet rs = stmt.executeQuery(sqlsearch);
-	        titre =rs.getString("titre");
-	        //description = rs.getString("description");
-	        image = rs.getString("image");
-	        auteur = rs.getString("auteur");
-	        album = rs.getString("album");
-	        //annee = rs.getString("annee");
-	        //category = rs.getString("category");
-	        exmplaireDispo = rs.getInt("NBEXEMPLAIRE") - rs.getInt("NBEMPRUNT");
-	        tarif = rs.getInt("TARIF");
-	        stmt.close();
-		    connexion.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	      
+		sqlHelper.connect();
+		sqlHelper.searchsql(sqlsearch);
+        titre =sqlHelper.getString("titre");
+        image = sqlHelper.getString("image");
+        auteur = sqlHelper.getString("auteur");
+        album = sqlHelper.getString("album");
+        exmplaireDispo = sqlHelper.getInt("NBEXEMPLAIRE") - sqlHelper.getInt("NBEMPRUNT");
+        tarif = sqlHelper.getInt("TARIF");
+        sqlHelper.disconnect();
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource()==buttonAjouter) {
 			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "AUDIO", (int)(comboWeek.getSelectedItem().toString().charAt(0)-'0') * tarif);
 			jf.dispose();

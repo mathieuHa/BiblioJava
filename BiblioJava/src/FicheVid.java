@@ -3,18 +3,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -23,41 +17,30 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.text.StyledDocument;
 
 public class FicheVid extends FicheDoc implements ActionListener{
 
 	private JPanel panelCenterAetI;
 	private JLabel labelResume;
-	private JLabel labelAut;
 	private JLabel labelAnne;
 	private String annee;
-	private JPanel panelAuteurEtDate;
 	private JPanel panelDate;
 	private JPanel panelBot;
-	private JPanel panelCategory;
-	private JTextArea labelCategory;
-	private String category;
-	private JLabel labelCat;
-	private JLabel categoryL;
 	private JPanel panelDispo;
 	private JLabel labelDisp;
-	private JLabel labelDisI;
 	private JLabel labelDisIOK;
 	private JLabel labelDisIKO;
 	private int exmplaireDispo;
 	private JPanel panelSelect;
-	private JComboBox<Integer> comboTime;
 	private int tarif;
 	private JLabel priceSelect;
 	private JLabel dureeSelect;
 	private JButton buttonAjouter;
-	private int Jeton = 0;
+	private int jeton = 0;
 	private String langage;
 	private String note;
 	private JLabel labelLang;
@@ -68,19 +51,21 @@ public class FicheVid extends FicheDoc implements ActionListener{
 	private int docId;
 	private JComboBox<String> comboWeek;
 	private JComboBox<String> comboDay;
+	private SqlHelper sqlhelper = new SqlHelper(); 
 	public FicheVid(int Id, User user) {
 		super(Id);
 		this.user = user;
-		docId = Id;
-		Jeton = user.getCredit();
+		this.docId = Id;
+		this.jeton = user.getCredit();
 		req(Id);
-		jf = new JFrame ();
-		jf.setTitle("Détail Article");
-		jf.setMinimumSize(new Dimension(600,800));
-		jf.setResizable(false);
-		jf.setVisible(true);
-		setPanel(new JPanel(new BorderLayout()));
-		panelTitre = new JPanel();
+		this.jf = new JFrame ();
+		this.jf.setTitle("Détail Article");
+		this.jf.setMinimumSize(new Dimension(600,800));
+		this.jf.setResizable(false);
+		this.jf.setVisible(true);
+		
+		this.panel=new JPanel(new BorderLayout());
+		this.panelTitre = new JPanel();
 		panelAuteur = new JPanel ();
 		panelDescription = new JPanel ();
 		panelExemplaire = new JPanel ();
@@ -93,22 +78,17 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		labelNbExemplaire = new JLabel ("Nb Exemplaire");
 		labelNbEmprunt    = new JLabel ("Nb Emprunt" );
 		
-		//scrollDescription = new JScrollPane (labelDescription);
-		//scrollDescription.setPreferredSize(new Dimension(400,200));
 		labelResume = new JLabel( "Résumé :");
 		labelDescription = new JTextArea("Description");
 		labelDescription.setFont(new Font(labelDescription.getFont().getFontName(),labelDescription.getFont().getStyle(),14));
 		labelDescription.setLineWrap(true);
 		labelDescription.setWrapStyleWord(true);
 		labelDescription.setEditable(false);
-		//labelDescription.setMargin(new Insets (10,10,10,10));
-		//labelDescription.setPreferredSize(new Dimension(500,100));
 		labelDescription.setMinimumSize(new Dimension(540,30));
 		labelDescription.setColumns(32);
 		labelDescription.setMaximumSize(new Dimension(540,100));
 		
 		labelDescription.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2, true));
-		//req(Id);
 		panelTitre.add(labelTitre);
 		panelTitre.setBackground(Color.CYAN);
 		panelExemplaire.add(Box.createHorizontalStrut(30));
@@ -122,19 +102,15 @@ public class FicheVid extends FicheDoc implements ActionListener{
 			labelImage = new JLabel( (Icon) new ImageIcon( new URL(image) ) );
 		} catch (MalformedURLException e) {
 			labelImage = new JLabel("erreur");
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//labelImage.setMinimumSize(new Dimension(120,150));
 		labelTitre.setText(titre);
 		labelDescription.setText(description);
-		//labelAuteur.setText(auteur);
 		
 		panelImage = new JPanel();
 		panelImage.add(labelImage);
 		
 		panelDescription.setLayout(new BoxLayout(panelDescription,BoxLayout.Y_AXIS));
-		//panelDescription.add(Box.createVerticalStrut(10));
 		panelDescription.add(labelResume);
 		panelDescription.add(Box.createVerticalStrut(5));
 		panelDescription.add(labelDescription);
@@ -144,14 +120,8 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		labelAnne = new JLabel ("Date : " + annee);
 		labelAnne.setFont(new Font(labelAnne.getFont().getFontName(),labelAnne.getFont().getStyle(),18));
 		
-		/*StyledDocument doc = labelLanguage.getStyledDocument();
-		SimpleAttributeSet center = new SimpleAttributeSet();
-		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-		doc.setParagraphAttributes(0, doc.getLength(), center, false);*/
-		
 		labelLang = new JLabel ("Langue :");
 		labelLanguage = new JTextArea (langage);
-		//labelLanguage.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
 		labelLanguage.setMinimumSize(new Dimension(150,10));
 		labelLanguage.setMaximumSize(new Dimension(150,100));
 		labelLanguage.setColumns(10);
@@ -161,8 +131,6 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		labelLanguage.setFont(new Font(labelLanguage.getFont().getFontName(),Font.ITALIC,16));
 		labelLanguage.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		
-		
-		
 		panelDate = new JPanel();
 		panelDate.setLayout(new BoxLayout(panelDate, BoxLayout.X_AXIS));
 		panelDate.add(Box.createHorizontalStrut(20));
@@ -170,7 +138,6 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		panelDate.add(Box.createHorizontalGlue());
 		
 		labelNote = new JTextArea(note);
-		//labelNote.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
 		labelNote.setMinimumSize(new Dimension(150,10));
 		labelNote.setMaximumSize(new Dimension(150,100));
 		labelNote.setColumns(10);
@@ -180,17 +147,13 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		labelNote.setFont(new Font(labelNote.getFont().getFontName(),labelNote.getFont().getStyle(),16));
 		labelNote.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
 		panelAuteur.setLayout(new BoxLayout(panelAuteur,BoxLayout.Y_AXIS));
-		//panelAuteur.add(Box.createVerticalStrut(2));
 		panelAuteur.add(panelDate);
 		panelAuteur.add(labelNot);
 		panelAuteur.add(labelNote);
-		//panelAuteur.add(panelCategory);
-		//panelAuteur.add(Box.createHorizontalStrut(2));
 		panelAuteur.add(labelLang);
 		panelAuteur.add(Box.createVerticalStrut(5));
 		panelAuteur.add(labelLanguage);
 		panelAuteur.add(Box.createHorizontalStrut(10));
-		//panelAuteur.add(Box.createVerticalGlue());
 		panelCommun = new JPanel(new GridLayout(3,1));
 		
 		panelAuteurplusImage = new JPanel ();
@@ -211,7 +174,6 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		
 		panelCommun.add(panelCenterAetI);
 		panelCommun.add(panelDescription);
-		//panelCommun.setBackground(Color.BLACK);
 		
 		panelBot = new JPanel();
 		panelBot.setLayout(new GridLayout(3,1));
@@ -277,7 +239,6 @@ public class FicheVid extends FicheDoc implements ActionListener{
 			buttonAjouter.setEnabled(false);
 		}
 		buttonAjouter.setEnabled(false);
-		
 		buttonAjouter.addActionListener(this);
 		
 		panelBot.add(panelDispo);
@@ -285,23 +246,14 @@ public class FicheVid extends FicheDoc implements ActionListener{
 		panelBot.add(buttonAjouter);
 		panelCommun.add(panelBot);
 		
-		
-		
-		
 		getPanel().add(panelTitre,BorderLayout.NORTH);
 		getPanel().add(panelCommun,BorderLayout.CENTER);
-		//panel.add(labelImage,BorderLayout.SOUTH);
 		jf.add(getPanel());
-		//super.addUI();
-		// TODO Auto-generated constructor stub
 	}
 	
 	class ItemAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			System.out.println("ActionListener : action sur " + comboWeek.getSelectedItem());
-			
 			priceSelect.setText("Price Total : " + ((int)((comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif)) + " Crédits");
 			if (comboWeek.getSelectedItem().toString().charAt(0)!='0' && comboDay.getSelectedItem().toString().charAt(0)!='0')
 				buttonAjouter.setText("Emprunter pour " + comboWeek.getSelectedItem() + " et " +comboDay.getSelectedItem());
@@ -310,7 +262,7 @@ public class FicheVid extends FicheDoc implements ActionListener{
 			else if (comboDay.getSelectedItem().toString().charAt(0)!='0')
 				buttonAjouter.setText("Emprunter pour " +comboDay.getSelectedItem());
 			else buttonAjouter.setText("Emprunter");
-			if (Jeton <= (int)(comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif || ( comboWeek.getSelectedItem().toString().charAt(0)=='0' && comboDay.getSelectedItem().toString().charAt(0)=='0')){
+			if (jeton <= (int)(comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif || ( comboWeek.getSelectedItem().toString().charAt(0)=='0' && comboDay.getSelectedItem().toString().charAt(0)=='0')){
 				buttonAjouter.setEnabled(false);
 			}
 			else if (exmplaireDispo > 0){
@@ -321,39 +273,26 @@ public class FicheVid extends FicheDoc implements ActionListener{
 	private class ItemState implements ItemListener{
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
-			// TODO Auto-generated method stub
 			System.out.println("événement déclenché sur : " + arg0.getItem());
 		}               
 	  }
 	public void req (int Id){
 		String sqlsearch = "SELECT * FROM VIDEO where ID = " + Id;
-		 try {
-			Class.forName("org.sqlite.JDBC");
-			Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-	        System.out.println("Opened database Video successfully");
-	        Statement stmt = connexion.createStatement();
-	        ResultSet rs = stmt.executeQuery(sqlsearch);
-	        titre =rs.getString("titre");
-	        description = rs.getString("description");
-	        image = rs.getString("image");
-	        //auteur = rs.getString("auteur");
-	        langage = rs.getString("language");
-	        note = rs.getString("note");
-	        annee = rs.getString("annee");
-	        //category = rs.getString("category");
-	        exmplaireDispo = rs.getInt("NBEXEMPLAIRE") - rs.getInt("NBEMPRUNT");
-	        tarif = rs.getInt("TARIF");
-	        stmt.close();
-		    connexion.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	      
+		sqlhelper.connect();
+		sqlhelper.searchsql(sqlsearch);
+        titre =sqlhelper.getString("titre");
+        description = sqlhelper.getString("description");
+        image = sqlhelper.getString("image");
+        langage = sqlhelper.getString("language");
+        note = sqlhelper.getString("note");
+        annee = sqlhelper.getString("annee");
+        exmplaireDispo = sqlhelper.getInt("NBEXEMPLAIRE") - sqlhelper.getInt("NBEMPRUNT");
+        tarif = sqlhelper.getInt("TARIF");
+        sqlhelper.disconnect();
 	}
+	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource()==buttonAjouter) {
 			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "VIDEO", (int)(comboWeek.getSelectedItem().toString().charAt(0)-'0') * tarif);
 			jf.dispose();
