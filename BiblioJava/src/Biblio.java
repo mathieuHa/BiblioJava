@@ -115,6 +115,8 @@ public class Biblio implements ActionListener{
 	private ArrayList<Integer> lIntegerC;
 	private static SimpleDateFormat formater;
 	private Calendar calendar = Calendar.getInstance();
+	private SqlHelper sqlHelper = new SqlHelper();
+	private ResultSet rs;
 	
 	public Biblio () {
 		//create_table();
@@ -451,107 +453,64 @@ public class Biblio implements ActionListener{
 	    
 	    frame.add(panelbouton, BorderLayout.NORTH);
 	    frame.add(panel, BorderLayout.CENTER);
-		
 		frame.setVisible(true);
 
-		//AddJson.addVideo();
-		//AddJson.addMusic(1);
-		//AddJson.addBook(null);
 		UpdateDataBase updb = new UpdateDataBase();
 		
 		//AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY
 	}
 	
-	JLabel addImage (String path){
-		BufferedImage myPicture;
-		try {
-			myPicture = ImageIO.read(new File("img/"));
-			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-			return picLabel;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	public static String compteur (String end){
-		String ret ="";
 		formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date datenow = new Date();
-		
 		Date dateEnd = null;
 		try {
 			dateEnd = formater.parse(end);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		long time =  dateEnd.getTime() - datenow.getTime();
-		long temp;
-		long day = 0;
+		long day  = 0;
 		long hour = 0;
-		long min = 0;
-		long sec = 0;
+		long min  = 0;
+		long sec  = 0;
 		datenow.setTime(time);
 		time/=1000;
-		//formater = new SimpleDateFormat("dd hh:mm:ss");
-		
-		//System.out.println(formater.format(datenow));
 		day = time/(24*60*60);
 		hour = time / (60*60) - day*24;
 		min = time / 60 - hour*60 - day*24*60;
 		sec = time - day*24*60*60 - hour*60*60 - min*60;
-		
-		String.format("%02d", day); // => "001"
-		
-		System.out.println("day = " + String.format("%02d", day) + " hour = " + String.format("%02d", hour) + " min = " + String.format("%02d", min) + " sec = " + String.format("%02d", sec));
-		
 		return day + " jours " + hour + ":" + min + ":" + sec;
-		
 	}
 	
 	
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource() == boutonCompte){
 			cl.show(panel, "compte");
-			System.out.println("recherche fiche");
-			String sqlsearch = "SELECT * FROM FICHE where userid="+user.getId();
-			System.out.println(sqlsearch);
-			try {
-			      Class.forName("org.sqlite.JDBC");
-			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database FICHE successfully");
-			      Statement stmt = connexion.createStatement();
-			      ResultSet rs = stmt.executeQuery(sqlsearch);
-			      nbResult = 0;
-			      clearSearch(panelFiches,panelFicheVoir);
-			      lButtonC.clear();
-			      lIntegerC.clear();
-			      for (ObjList o : lobj) o.setCancel(true); 
-			      lobj.clear();
-			      System.out.println("Before while");
-			      while ( rs.next() && nbResult <8) {
-			    	System.out.println(compteur (rs.getString("datefin")));
-			    	obj = new ObjList(rs.getString("docId"),rs.getString("typedoc"),rs.getString("dateemprunt"),rs.getString("datefin"),frame.getWidth()-100,panelFiches);
-			    	obj.Sstart(rs.getString("datefin"));
-			    	lButtonC.add(obj.getButtonVP());
-			    	lIntegerC.add(rs.getInt("id"));
-			    	obj.getButtonVP().addActionListener(this);
-			    	nbResult++;
-			    	lobj.add(obj);
-				  }
-			      panelFiches.updateUI();
-			      stmt.close();
-			      connexion.close();
-			      obj.updateTitre(lobj);
-			    } catch ( Exception e ) {
-			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			    }
-			
+	        nbResult = 0;
+	        clearSearch(panelFiches,panelFicheVoir);
+	        lButtonC.clear();
+	        lIntegerC.clear();
+	        String sqlsearch = "SELECT * FROM FICHE where userid="+user.getId();
+	        sqlHelper.connect();
+			sqlHelper.searchsql(sqlsearch);
+	        for (ObjList o : lobj) o.setCancel(true); 
+			lobj.clear();
+		    while ( sqlHelper.getNext() && nbResult <8) {
+		    	System.out.println(compteur (sqlHelper.getString("datefin")));
+		    	obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),frame.getWidth()-100,panelFiches);
+		    	obj.Sstart(sqlHelper.getString("datefin"));
+		    	lButtonC.add(obj.getButtonVP());
+		    	lIntegerC.add(sqlHelper.getInt("id"));
+		    	obj.getButtonVP().addActionListener(this);
+		    	nbResult++;
+		    	lobj.add(obj);
+			}
+		    sqlHelper.disconnect();
+			panelFiches.updateUI();
+			obj.updateTitre(lobj);
 		}
 		else if (arg0.getSource() == boutonMusique){
 			cl.show(panel, "musique");
@@ -563,115 +522,80 @@ public class Biblio implements ActionListener{
 			cl.show(panel, "video");
 		}
 		else if (arg0.getSource() == boutonCompteAddMusique){
-			System.out.println("add musique");
 			add = new AddMusique ();
 		}
 		else if (arg0.getSource() == boutonCompteAddVideo){
-			System.out.println("add video");
 			add = new AddVideo ();
 		}
 		else if (arg0.getSource() == boutonCompteAddLivre){
-			System.out.println("add livre");
 			add = new AddLivre ();
 		}
 		else if (arg0.getSource() == boutonOKVideo){
-			System.out.println("recherche video");
-			String sqlsearch = "SELECT * FROM VIDEO where TITRE LIKE '" +"%"+ jtfFilm.getText() +"%"+ "'";
-			try {
-			      Class.forName("org.sqlite.JDBC");
-			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database Video successfully");
-			      Statement stmt = connexion.createStatement();
-			      ResultSet rs = stmt.executeQuery(sqlsearch);
-			      nbResult = 0;
-			      clearSearch(panelfilmResult,panelfilmhelp);
-			      lButtonV.clear();
-			      lIntegerV.clear();
-			      while ( rs.next() && nbResult <5) {
-			    	obj = new ObjList(rs.getString("titre"),rs.getString("description"),rs.getString("annee"),rs.getString("note"),rs.getString("image"),rs.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
-			    	lButtonV.add(obj.getButtonVP());
-			    	lIntegerV.add(rs.getInt("id"));
-			    	obj.getButtonVP().addActionListener(this);
-			    	nbResult++;
-				  }
-			      panelfilmResult.updateUI();
-			      stmt.close();
-			      connexion.close();
-			    } catch ( Exception e ) {
-			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			      System.exit(0);
-			    }
+		    nbResult = 0;
+		    clearSearch(panelfilmResult,panelfilmhelp);
+		    lButtonV.clear();
+		    lIntegerV.clear();
+		    sqlHelper.connect();
+		    String sqlsearch = "SELECT * FROM VIDEO where TITRE LIKE '" +"%"+ jtfFilm.getText() +"%"+ "'";
+			sqlHelper.searchsql(sqlsearch);
+			while ( sqlHelper.getNext() && nbResult <5) {
+		    	obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("description"),sqlHelper.getString("annee"),sqlHelper.getString("note"),sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panelfilmResult,frame.getWidth()-100);
+		    	lButtonV.add(obj.getButtonVP());
+		    	lIntegerV.add(sqlHelper.getInt("id"));
+		    	obj.getButtonVP().addActionListener(this);
+		    	nbResult++;
+			}
+			sqlHelper.disconnect();
+			panelfilmResult.updateUI();
 			}
 		else if (arg0.getSource() == boutonOKMusique){
-			System.out.println("recherche musique" + jtfMusique.getText());
-			String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
-			try {
-			      Class.forName("org.sqlite.JDBC");
-			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database Musique successfully");
-			      Statement stmt = connexion.createStatement();
-			      ResultSet rs = stmt.executeQuery(sqlsearch);
-			      nbResult = 0;
-			      clearSearch(panelmusiqueResult,panelmusiquehelp);
-			      lButtonM.clear();
-			      lIntegerM.clear();
-			      while ( rs.next() && nbResult<5) {
-			    	  obj = new ObjList(rs.getString("titre"),rs.getString("album"),rs.getString("auteur"),"",rs.getString("image"),rs.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
-			    	  lButtonM.add(obj.getButtonVP());
-				      lIntegerM.add(rs.getInt("id"));
-				      System.out.println(lButtonM.size());
-				      obj.getButtonVP().addActionListener(this);
-			    	  nbResult++;
-				  }
-			      panelmusiqueResult.updateUI();
-			      stmt.close();
-			      connexion.close();
-			    } catch ( Exception e ) {
-			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			      System.exit(0);
-			    }
-			}
+	        nbResult = 0;
+	        clearSearch(panelmusiqueResult,panelmusiquehelp);
+	        lButtonM.clear();
+	        lIntegerM.clear();
+	        sqlHelper.connect();
+	        String sqlsearch = "SELECT * FROM AUDIO where TITRE LIKE '" + "%" +jtfMusique.getText() + "%" + "'";
+	        sqlHelper.searchsql(sqlsearch);
+        	while ( sqlHelper.getNext() && nbResult<5) {
+	    	    obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("album"),sqlHelper.getString("auteur"),"",sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panelmusiqueResult,frame.getWidth()-100);
+	    	    lButtonM.add(obj.getButtonVP());
+		        lIntegerM.add(sqlHelper.getInt("id"));
+		        System.out.println(lButtonM.size());
+		        obj.getButtonVP().addActionListener(this);
+	    	    nbResult++;
+		    }
+        	sqlHelper.disconnect();
+	        panelmusiqueResult.updateUI();
+		}
 		else if (arg0.getSource() == boutonOKLivre){
-			System.out.println("recherche livre");
-			String sqlsearch = "SELECT * FROM LIVRE where TITRE LIKE '" + "%" + jtfLivre.getText() + "%"  + "'";
-			try {
-			      Class.forName("org.sqlite.JDBC");
-			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database Livre successfully");
-			      Statement stmt = connexion.createStatement();
-			      ResultSet rs = stmt.executeQuery(sqlsearch);
-			      nbResult = 0;
-			      clearSearch(panellivreResult,panellivrehelp);
-			      lButtonL.clear();
-			      lIntegerL.clear();
-			      while ( rs.next() && nbResult <5) {
-			    	obj = new ObjList(rs.getString("titre"),rs.getString("auteur"),rs.getString("annee"),rs.getString("category"),rs.getString("image"),rs.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
-			    	lButtonL.add(obj.getButtonVP());
-			    	lIntegerL.add(rs.getInt("id"));
-			    	System.out.println(lButtonL.size());
-			    	obj.getButtonVP().addActionListener(this);
-			    	nbResult++;
-				  }
-			      panellivreResult.updateUI();
-			      stmt.close();
-			      connexion.close();
-			    } catch ( Exception e ) {
-			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			      System.exit(0);
-			    }
-			}
+			
+	        nbResult = 0;
+	        clearSearch(panellivreResult,panellivrehelp);
+	        lButtonL.clear();
+	        lIntegerL.clear();
+	        sqlHelper.connect();
+	        String sqlsearch = "SELECT * FROM LIVRE where TITRE LIKE '" + "%" + jtfLivre.getText() + "%"  + "'";
+	        sqlHelper.searchsql(sqlsearch);
+	        while ( sqlHelper.getNext() && nbResult <5) {
+	        	obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("auteur"),sqlHelper.getString("annee"),sqlHelper.getString("category"),sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panellivreResult,frame.getWidth()-100);
+	        	lButtonL.add(obj.getButtonVP());
+		    	lIntegerL.add(sqlHelper.getInt("id"));
+		    	System.out.println(lButtonL.size());
+		    	obj.getButtonVP().addActionListener(this);
+		    	nbResult++;
+	        }
+	        sqlHelper.disconnect();
+	        panellivreResult.updateUI();
+		}
 		else if (boutonfilmReset == arg0.getSource()){
-			System.out.println("bouton reset");
 			clearSearch(panelfilmResult,panelfilmhelp);
 			panelfilmResult.updateUI();
 		}
 		else if (boutonmusiqueReset == arg0.getSource()){
-			System.out.println("bouton reset");
 			clearSearch(panelmusiqueResult,panelmusiquehelp);
 			panelmusiqueResult.updateUI();
 		}
 		else if (boutonlivreReset == arg0.getSource()){
-			System.out.println("bouton reset");
 			clearSearch(panellivreResult,panellivrehelp);
 			panellivreResult.updateUI();
 		}
@@ -680,30 +604,21 @@ public class Biblio implements ActionListener{
 				int cpt = 0;
 				for (JButton jb : lButtonV){
 					cpt++;
-					if (jb == arg0.getSource()){
-						System.out.println(lIntegerV.get(cpt-1).toString());
-						new FicheVid(lIntegerV.get(cpt-1).intValue(),user);
-					}
+					if (jb == arg0.getSource()) new FicheVid(lIntegerV.get(cpt-1).intValue(),user);
 				}
 			}
 			if (!lButtonL.isEmpty()){
 				int cpt = 0;
 				for (JButton jb1 : lButtonL){
 					cpt++;
-					if (jb1 == arg0.getSource()){
-						System.out.println(lIntegerL.get(cpt-1).toString());
-						new FicheLivre(lIntegerL.get(cpt-1).intValue(),user);
-					}
+					if (jb1 == arg0.getSource()) new FicheLivre(lIntegerL.get(cpt-1).intValue(),user);
 				}
 			}	
 			if (!lButtonM.isEmpty()){
 				int cpt = 0;
 				for (JButton jb2 : lButtonM){
 					cpt++;
-					if (jb2 == arg0.getSource()){
-						System.out.println(lIntegerM.get(cpt-1).toString());
-						new FicheMusique(lIntegerM.get(cpt-1).intValue(),user);
-					}
+					if (jb2 == arg0.getSource()) new FicheMusique(lIntegerM.get(cpt-1).intValue(),user);
 				}
 			}	
 		}
@@ -712,9 +627,8 @@ public class Biblio implements ActionListener{
 	}
 	
 	public void clearSearch (JPanel paneR, JPanel paneAdd){
-		System.out.println("reset");
-			paneR.removeAll();
-			paneR.add(paneAdd);
+		paneR.removeAll();
+		paneR.add(paneAdd);
 	}
 	
 	public String returnEntry(String str, ResultSet rs){

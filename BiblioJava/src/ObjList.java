@@ -121,12 +121,12 @@ public class ObjList {
 		      System.out.println("Opened database FICHE successfully");
 		      Statement stmt = connexion.createStatement();
 		      for (ObjList o : objL){
-			      String sqltitre = "SELECT * FROM "+ this.bd + " where id="+this.id;
+			      String sqltitre = "SELECT * FROM "+ o.getBd() + " where id="+o.getId();
 			      //ResultSet rs = stmt.executeQuery(sqlsearch);
 			      ResultSet rsTitre;
 				  rsTitre = stmt.executeQuery(sqltitre);
 				  String titre = rsTitre.getString("titre");
-				  labeltitle.setText((titre.length() > sizetext) ? titre.substring(0, sizetext)+".." : titre);
+				  o.getLabeltitle().setText((titre.length() > sizetext) ? titre.substring(0, sizetext)+".." : titre);
 				  rsTitre.close();
 			  }
 		      stmt.close();
@@ -137,6 +137,22 @@ public class ObjList {
 		    }
 		
 	}
+
+	public JLabel getLabeltitle() {
+		return labeltitle;
+	}
+
+
+
+
+
+	public void setLabeltitle(JLabel labeltitle) {
+		this.labeltitle = labeltitle;
+	}
+
+
+
+
 
 	public ObjList (String titre, String type, String dateEmprunt, String dateFin, int width, JPanel Pane)
 	{
@@ -153,7 +169,7 @@ public class ObjList {
 		setLabelTimer(new JLabel(Biblio.compteur(dateFin)));
 		obj.add(Box.createHorizontalStrut(25));
 		obj.add(labeltitle);
-		obj.add(Box.createHorizontalStrut(width/7-(int)labeltitle.getPreferredSize().getWidth()));
+		obj.add(Box.createHorizontalStrut(width/7-30));
 		obj.add(labeltype);
 		obj.add(Box.createHorizontalStrut(width/7-(int)labeltype.getPreferredSize().getWidth()));
 		obj.add(labeldateEmprunt);
