@@ -43,7 +43,7 @@ public class Autentification implements ActionListener {
 	public Autentification () {
 		new JOptionPane();
 		user = new User();
-
+		
 		line = BorderFactory.createLineBorder(Color.WHITE, 3);
 		frame = new JFrame ("Autentification");
 		frame.setMinimumSize(new Dimension(640,350));
@@ -164,6 +164,7 @@ public class Autentification implements ActionListener {
 						         if (username.equals(fieldlogin.getText()) && password.equals(pass)){
 						        	 System.out.println("connexion");
 						        	 user.setLogin(fieldlogin.getText());
+						        	 user.setId(id);
 						        	 ok = true;
 						        	 frame.dispose();
 						         }

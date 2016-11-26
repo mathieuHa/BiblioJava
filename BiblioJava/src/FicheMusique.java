@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -28,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class FicheMusique extends FicheDoc {
+public class FicheMusique extends FicheDoc implements ActionListener{
 
 	private JPanel panelCenterAetI;
 	private JLabel labelResume;
@@ -59,8 +58,14 @@ public class FicheMusique extends FicheDoc {
 	private String album;
 	private JTextArea labelAlbum;
 	private JLabel labelAlb;
+	private User user;
+	private int docId;
+	private JComboBox<String> comboWeek;
+	private JComboBox<String> comboDay;
 	public FicheMusique(int Id, User user) {
 		super(Id);
+		this.user = user;
+		this.docId = Id;
 		Jeton = user.getCredit();
 		req(Id);
 		jf = new JFrame ();
@@ -192,26 +197,44 @@ public class FicheMusique extends FicheDoc {
 		panelDispo.setLayout(new BoxLayout(panelDispo,BoxLayout.X_AXIS));
 		
 		panelSelect = new JPanel();
-		comboTime = new JComboBox<Integer>();
-		comboTime.setPreferredSize(new Dimension(50,30));
-		comboTime.setMaximumSize(new Dimension(50,30));
-		comboTime.addItem(0);
-		comboTime.addItem(1);
-		comboTime.addItem(2);
-		comboTime.addItem(3);
-		comboTime.addItem(4);
-		comboTime.addItemListener(new ItemState());
-		comboTime.addActionListener(new ItemAction());
+		comboWeek = new JComboBox<String>();
+		comboWeek.setFont(new Font(comboWeek.getFont().getFontName(),comboWeek.getFont().getStyle(),16));
+		comboWeek.setPreferredSize(new Dimension(120,30));
+		comboWeek.setMaximumSize(new Dimension(120,30));
+		comboWeek.addItem(0 + " semaine");
+		comboWeek.addItem(1 + " semaine");
+		comboWeek.addItem(2 + " semaines");
+		comboWeek.addItem(3 + " semaines");
+		comboWeek.addItem(4 + " semaines");
+		comboWeek.addItemListener(new ItemState());
+		comboWeek.addActionListener(new ItemAction());
+		
+		comboDay = new JComboBox<String>();
+		comboDay.setFont(new Font(comboDay.getFont().getFontName(),comboDay.getFont().getStyle(),16));
+		comboDay.setPreferredSize(new Dimension(80,30));
+		comboDay.setMaximumSize(new Dimension(80,30));
+		comboDay.addItem(0 + " jour");
+		comboDay.addItem(1 + " jour");
+		comboDay.addItem(2 + " jours");
+		comboDay.addItem(3 + " jours");
+		comboDay.addItem(4 + " jours");
+		comboDay.addItem(5 + " jours");
+		comboDay.addItem(6 + " jours");
+		comboDay.addItemListener(new ItemState());
+		comboDay.addActionListener(new ItemAction());
 		
 		panelSelect.setLayout(new BoxLayout(panelSelect,BoxLayout.X_AXIS));
 		
-		priceSelect = new JLabel ("Price " + tarif + "Crédit/Semaine  Total : 0 Crédits");
+		priceSelect = new JLabel ("Price Total : 0 Crédits");
+		priceSelect.setFont(new Font(priceSelect.getFont().getFontName(),Font.ROMAN_BASELINE,14));
 		dureeSelect = new JLabel ("Durée : ");
 		panelSelect.add(Box.createHorizontalStrut(50));
 		panelSelect.add(dureeSelect);
-		panelSelect.add(Box.createHorizontalStrut(50));
-		panelSelect.add(comboTime);
-		panelSelect.add(Box.createHorizontalStrut(50));
+		panelSelect.add(Box.createHorizontalStrut(25));
+		panelSelect.add(comboWeek);
+		panelSelect.add(Box.createHorizontalStrut(25));
+		panelSelect.add(comboDay);
+		panelSelect.add(Box.createHorizontalStrut(25));
 		panelSelect.add(priceSelect);
 		panelSelect.add(Box.createHorizontalGlue());
 		
@@ -219,7 +242,9 @@ public class FicheMusique extends FicheDoc {
 		labelDisIOK = new JLabel ((Icon) (new ImageIcon("valOK.png")));
 		labelDisIKO = new JLabel ((Icon) (new ImageIcon("valKO.png")));
 		
-		buttonAjouter = new JButton ("Emprunter pour 0 semaine");
+		buttonAjouter = new JButton ("Emprunte");
+		buttonAjouter.setForeground(Color.RED);
+		buttonAjouter.setFont(new Font(buttonAjouter.getFont().getFontName(),buttonAjouter.getFont().getStyle(),18));
 		
 		panelDispo.add(labelDisp);
 		if (exmplaireDispo > 0) {
@@ -228,8 +253,10 @@ public class FicheMusique extends FicheDoc {
 			panelDispo.add(labelDisIKO);
 			buttonAjouter.setEnabled(false);
 		}
-		
 		buttonAjouter.setEnabled(false);
+		
+		buttonAjouter.addActionListener(this);
+		
 		panelBot.add(panelDispo);
 		panelBot.add(panelSelect);
 		panelBot.add(buttonAjouter);
@@ -247,16 +274,24 @@ public class FicheMusique extends FicheDoc {
 	}
 	
 	class ItemAction implements ActionListener{
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("ActionListener : action sur " + comboTime.getSelectedItem());
-			priceSelect.setText("Price " + tarif + " / semaine  Total : " + (int)(comboTime.getSelectedItem()) * tarif + " Crédits");
-			buttonAjouter.setText("Emprunter pour " + comboTime.getSelectedItem() + " semaine");
-			if (Jeton <= (int)(comboTime.getSelectedItem()) * tarif || (int)comboTime.getSelectedItem()==0){
+			System.out.println("ActionListener : action sur " + comboWeek.getSelectedItem());
+			
+			priceSelect.setText("Price Total : " + ((int)((comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif)) + " Crédits");
+			if (comboWeek.getSelectedItem().toString().charAt(0)!='0' && comboDay.getSelectedItem().toString().charAt(0)!='0')
+				buttonAjouter.setText("Emprunter pour " + comboWeek.getSelectedItem() + " et " +comboDay.getSelectedItem());
+			else if (comboWeek.getSelectedItem().toString().charAt(0)!='0')
+				buttonAjouter.setText("Emprunter pour " + comboWeek.getSelectedItem());
+			else if (comboDay.getSelectedItem().toString().charAt(0)!='0')
+				buttonAjouter.setText("Emprunter pour " +comboDay.getSelectedItem());
+			else buttonAjouter.setText("Emprunter");
+			if (Jeton <= (int)(comboWeek.getSelectedItem().toString().charAt(0)-"0".charAt(0)) * tarif || ( comboWeek.getSelectedItem().toString().charAt(0)=='0' && comboDay.getSelectedItem().toString().charAt(0)=='0')){
 				buttonAjouter.setEnabled(false);
 			}
-			else if (exmplaireDispo > 0 ){
+			else if (exmplaireDispo > 0){
 				buttonAjouter.setEnabled(true);
 			}
 		}               
@@ -293,6 +328,15 @@ public class FicheMusique extends FicheDoc {
 			e.printStackTrace();
 		}
 	      
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		if (arg0.getSource()==buttonAjouter) {
+			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "AUDIO", (int)(comboWeek.getSelectedItem().toString().charAt(0)) * tarif);
+			jf.dispose();
+		}
 	}
 
 }

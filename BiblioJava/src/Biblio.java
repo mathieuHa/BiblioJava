@@ -227,7 +227,7 @@ public class Biblio implements ActionListener{
                   " USERID             INT     NOT NULL, " + 
                   " DOCID              INT     NOT NULL, " +
                   " DATEEMPRUNT        TEXT    NOT NULL, " +
-                  " DUREE             TEXT    NOT NULL)  ";
+                  " DATEFIN            TEXT    NOT NULL)  ";
           
 	      
 	      String sqllivre = "CREATE TABLE LIVRE " +

@@ -7,6 +7,7 @@ public class User {
 
 	private String username;
 	private int credit;
+	private int id;
 	
 	public User(String login) {
 		super();
@@ -23,6 +24,7 @@ public class User {
 		      System.out.println(sqluser);
 		      ResultSet rs = stmt.executeQuery(sqluser);
 		      this.setCredit(rs.getInt("credit"));
+		      this.setId(rs.getInt("id"));
 		      stmt.close();
 		      connexion.close();
 		    } catch ( Exception e ) {
@@ -31,6 +33,13 @@ public class User {
 		    }
 	}
 	
+	public User(String username, int credit, int id) {
+		super();
+		this.username = username;
+		this.credit = credit;
+		this.id = id;
+	}
+
 	@Override
 	public String toString() {
 		return "User [username=" + username + ", credit=" + credit + "]";
@@ -64,6 +73,14 @@ public class User {
 
 	public void setCredit(int credit) {
 		this.credit = credit;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }
