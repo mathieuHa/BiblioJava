@@ -355,7 +355,7 @@ public class FicheVid extends FicheDoc implements ActionListener{
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		if (arg0.getSource()==buttonAjouter) {
-			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "VIDEO", (int)(comboWeek.getSelectedItem().toString().charAt(0)) * tarif);
+			new FicheEmprunt (user, docId,comboWeek.getSelectedItem().toString().charAt(0)-'0', comboDay.getSelectedItem().toString().charAt(0)-'0', "VIDEO", (int)(comboWeek.getSelectedItem().toString().charAt(0)-'0') * tarif);
 			jf.dispose();
 		}
 	}

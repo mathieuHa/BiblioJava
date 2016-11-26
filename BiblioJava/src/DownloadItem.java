@@ -21,14 +21,17 @@ public class DownloadItem {
 		jf.setVisible(true);
 		sw = new SwingWorker<Void,Void>(){
 
+			private String s;
+
 			@Override
 			protected Void doInBackground() throws Exception {
 				
 				// TODO Auto-generated method stub
 				ad.connexion();
 				for (int i = 1; i<10; i++){
+					for (int j = 1; j<1000; j++)
+						s = scanner.nextLine();
 					
-					String s = scanner.nextLine();
 					System.out.println(s+" "+i);
 					ad.addVideo(i);
 					//setProgress(i);

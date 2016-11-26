@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.Calendar;
 
 import javax.swing.JOptionPane;
@@ -27,8 +29,10 @@ public class FicheEmprunt
 	public static Date ajouterJouretSemaine(Date date, int nbDay, int nbWeek) {
 		  Calendar cal = Calendar.getInstance(); 
 		  cal.setTime(date);
-		  cal.add(Calendar.DAY_OF_MONTH, nbDay);
-		  cal.add(Calendar.WEEK_OF_MONTH, nbWeek);
+		  cal.add(Calendar.DAY_OF_YEAR, nbDay);
+		  cal.add(Calendar.WEEK_OF_YEAR, nbWeek);
+		 // cal.set(Calendar.HOUR_OF_DAY, 0);
+		  //cal.add(Calendar.HOUR, -13);
 		  return cal.getTime();
 	}
 
@@ -41,8 +45,9 @@ public class FicheEmprunt
 		this.nbDay = nbDay;
 		this.bd = bd;
 		this.credits = Credit;
+		System.out.println(Credit);
 		this.now = new Date();
-		this.formater = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		this.formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		this.end = ajouterJouretSemaine(this.now, this.nbDay, this.nbWeek);
 		this.removeFromStock();
 		this.insert();
@@ -75,9 +80,10 @@ public class FicheEmprunt
 	}
 
 	public void insert () {
-		String sqlinsert = "INSERT INTO FICHE (USERID,DOCID,DATEEMPRUNT,DATEFIN) " +
+		String sqlinsert = "INSERT INTO FICHE (USERID,DOCID,TYPEDOC,DATEEMPRUNT,DATEFIN) " +
                    "VALUES ('" + user.getId() + "',"
                    		 + "'" + docId + "',"
+                   		 + "'" + bd + "',"
                    		 + "'" + formater.format(now) + "',"
                    		 + "'" + formater.format(end) + "');"; 
 		try {
@@ -85,6 +91,7 @@ public class FicheEmprunt
 		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
 		      System.out.println("Opened database Musie successfully");
 		      Statement stmt = connexion.createStatement();
+		      System.out.println(sqlinsert);
 	    	  stmt.executeUpdate(sqlinsert);
 		      stmt.close();
 		      connexion.close();
@@ -104,7 +111,8 @@ public class FicheEmprunt
 		      ResultSet rs = stmt.executeQuery(sqlCount);
 		      creditBefore = rs.getInt("credit");
 		      System.out.println(creditBefore);
-		      String sqlUpdate = "UPDATE LOGIN SET CREDIT =" + (creditBefore-this.credits) + " WHERE ID =" + user.getId(); 
+		      String sqlUpdate = "UPDATE LOGIN SET CREDIT =" + (creditBefore-this.credits) + " WHERE ID =" + user.getId();
+		      System.out.println(sqlUpdate);
 		      stmt.execute(sqlUpdate);
 		      stmt.close();
 		      connexion.close();

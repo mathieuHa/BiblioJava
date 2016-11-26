@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +14,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -77,6 +82,7 @@ public class Biblio implements ActionListener{
 	private ArrayList<Integer> lIntegerM;
 	private ArrayList<JButton> lButtonL;
 	private ArrayList<Integer> lIntegerL;
+	private ArrayList<ObjList> lobj;
 	private JTextArea textAreaResultMusique;
 	private JScrollPane scrollMusique;
 	private JTextArea textAreaResultAudio;
@@ -102,6 +108,13 @@ public class Biblio implements ActionListener{
 	private JButton boutonfilmReset;
 	private JButton boutonlivrehelp;
 	private JButton boutonlivreReset;
+	private JPanel panelFiches;
+	private JLabel labelMesFiches;
+	private JPanel panelFicheVoir;
+	private ArrayList<JButton> lButtonC;
+	private ArrayList<Integer> lIntegerC;
+	private static SimpleDateFormat formater;
+	private Calendar calendar = Calendar.getInstance();
 	
 	public Biblio () {
 		//create_table();
@@ -113,6 +126,9 @@ public class Biblio implements ActionListener{
 	    lIntegerL = new ArrayList<Integer>();
 	    lButtonM = new ArrayList<JButton>();
 	    lIntegerM = new ArrayList<Integer>();
+	    lButtonC = new ArrayList<JButton>();
+	    lIntegerC = new ArrayList<Integer>();
+	    lobj = new ArrayList<ObjList>();
 	    
 		System.out.println("OK");
 	}
@@ -226,6 +242,7 @@ public class Biblio implements ActionListener{
                   "(ID INTEGER PRIMARY KEY     AUTOINCREMENT," +
                   " USERID             INT     NOT NULL, " + 
                   " DOCID              INT     NOT NULL, " +
+                  " TYPEDOC            TEXT     NOT NULL, " +
                   " DATEEMPRUNT        TEXT    NOT NULL, " +
                   " DATEFIN            TEXT    NOT NULL)  ";
           
@@ -313,6 +330,17 @@ public class Biblio implements ActionListener{
 	    panelAddmin.add(Box.createHorizontalGlue());
 	    panelAddmin.add(boutonCompteAddVideo);
 	    panelAddmin.add(Box.createHorizontalGlue());
+	    
+	    panelFiches = new JPanel (new GridLayout(10,1));
+	    labelMesFiches = new JLabel ("Mes Fiches");
+	    labelMesFiches.setFont(new Font(labelMesFiches.getFont().getFontName(),Font.ROMAN_BASELINE,20));
+	    panelFicheVoir = new JPanel();
+	    panelFicheVoir.add(labelMesFiches);
+	    
+	    
+	    
+	    panelFiches.add(panelFicheVoir);
+	    
 	    
 	    boutonCompte = new JButton("Compte");
 	    boutonVideo = new JButton("Video");
@@ -402,7 +430,7 @@ public class Biblio implements ActionListener{
 	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.WEST);
 	    panellivre.add(panelColor(Color.DARK_GRAY), BorderLayout.SOUTH);
 	    
-	   
+	    panelcompte.add(panelFiches,BorderLayout.CENTER);
 	    
 	    //panelfilms.add(scrollFilm,BorderLayout.CENTER);
 	    //panelmusique.add(scrollMusique);
@@ -447,6 +475,41 @@ public class Biblio implements ActionListener{
 		return null;
 	}
 	
+	public static String compteur (String end){
+		String ret ="";
+		formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date datenow = new Date();
+		
+		Date dateEnd = null;
+		try {
+			dateEnd = formater.parse(end);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long time =  dateEnd.getTime() - datenow.getTime();
+		long temp;
+		long day = 0;
+		long hour = 0;
+		long min = 0;
+		long sec = 0;
+		datenow.setTime(time);
+		time/=1000;
+		//formater = new SimpleDateFormat("dd hh:mm:ss");
+		
+		//System.out.println(formater.format(datenow));
+		day = time/(24*60*60);
+		hour = time / (60*60) - day*24;
+		min = time / 60 - hour*60 - day*24*60;
+		sec = time - day*24*60*60 - hour*60*60 - min*60;
+		
+		String.format("%02d", day); // => "001"
+		
+		System.out.println("day = " + String.format("%02d", day) + " hour = " + String.format("%02d", hour) + " min = " + String.format("%02d", min) + " sec = " + String.format("%02d", sec));
+		
+		return day + " jours " + hour + ":" + min + ":" + sec;
+		
+	}
 	
 	
 
@@ -455,6 +518,40 @@ public class Biblio implements ActionListener{
 		// TODO Auto-generated method stub
 		if (arg0.getSource() == boutonCompte){
 			cl.show(panel, "compte");
+			System.out.println("recherche fiche");
+			String sqlsearch = "SELECT * FROM FICHE where userid="+user.getId();
+			System.out.println(sqlsearch);
+			try {
+			      Class.forName("org.sqlite.JDBC");
+			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
+			      System.out.println("Opened database FICHE successfully");
+			      Statement stmt = connexion.createStatement();
+			      ResultSet rs = stmt.executeQuery(sqlsearch);
+			      nbResult = 0;
+			      clearSearch(panelFiches,panelFicheVoir);
+			      lButtonC.clear();
+			      lIntegerC.clear();
+			      for (ObjList o : lobj) o.setCancel(true); 
+			      lobj.clear();
+			      System.out.println("Before while");
+			      while ( rs.next() && nbResult <8) {
+			    	System.out.println(compteur (rs.getString("datefin")));
+			    	obj = new ObjList(rs.getString("docId"),rs.getString("typedoc"),rs.getString("dateemprunt"),rs.getString("datefin"),frame.getWidth()-100,panelFiches);
+			    	obj.Sstart(rs.getString("datefin"));
+			    	lButtonC.add(obj.getButtonVP());
+			    	lIntegerC.add(rs.getInt("id"));
+			    	obj.getButtonVP().addActionListener(this);
+			    	nbResult++;
+			    	lobj.add(obj);
+				  }
+			      panelFiches.updateUI();
+			      stmt.close();
+			      connexion.close();
+			      obj.updateTitre(lobj);
+			    } catch ( Exception e ) {
+			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			    }
+			
 		}
 		else if (arg0.getSource() == boutonMusique){
 			cl.show(panel, "musique");
