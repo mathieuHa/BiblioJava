@@ -1,34 +1,17 @@
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.text.NumberFormat;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class AddVideo extends AddDocument implements ActionListener{
-
-	private JPanel panel;
-	private JButton boutontest;
-	private JPanel panelAddDuree;
-	private JPanel panelAddMentionLegale;
-	private JLabel labelDuree;
-	private JLabel labelMentionLegale;
-	private JTextField fieldDuree;
-	private JTextField fieldMentionLegale;
-	private Video newVideo;
 
 	private JLabel labelAnnee = new JLabel("Annee");
 	private JLabel labelLangage = new JLabel("Langage");
@@ -36,8 +19,8 @@ public class AddVideo extends AddDocument implements ActionListener{
 	private JLabel labelNote = new JLabel("Note");
 	private JLabel labelDescription = new JLabel("Description");
 	private JTextArea fieldDescription = new JTextArea();
-	private JTextField fieldAnnee = new JTextField();
-	private JTextField fieldNote = new JTextField();
+	private JFormattedTextField fieldAnnee = new JFormattedTextField( NumberFormat.getNumberInstance() );
+	private JFormattedTextField fieldNote = new JFormattedTextField( NumberFormat.getNumberInstance() );
 	private JTextField fieldImage = new JTextField();
 	private JTextField fieldLangage = new JTextField();
 	public AddVideo() {
@@ -58,6 +41,10 @@ public class AddVideo extends AddDocument implements ActionListener{
 		c.gridx = 1;
 		pane.add(fieldNote, c);
 		c.gridx = 0; c.gridy++;
+		pane.add(labelLangage, c);
+		c.gridx = 1;
+		pane.add(fieldLangage, c);
+		c.gridx = 0; c.gridy++;
 		pane.add(labelImage, c);
 		c.gridx = 1;
 		pane.add(fieldImage, c);
@@ -67,6 +54,7 @@ public class AddVideo extends AddDocument implements ActionListener{
 		pane.add(fieldDescription, c);
 		
 		this.add(pane, BorderLayout.CENTER);
+		boutonvalider.addActionListener(this);
 		this.add(boutonvalider,BorderLayout.SOUTH);
 		this.setVisible(true);
 	}
@@ -76,29 +64,44 @@ public class AddVideo extends AddDocument implements ActionListener{
 		if (!docIsOK){
 			
 		}
-		else if (fieldDuree.getText().isEmpty()){
-			JOptionPane.showMessageDialog(null, "Duree empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		else if (fieldDescription.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "Desc empty", "Attention", JOptionPane.WARNING_MESSAGE);
 		}
-		else if (fieldMentionLegale.getText().isEmpty()){
-			JOptionPane.showMessageDialog(null, "Duree empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		else if (fieldImage.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "Img empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldAnnee.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "Annee empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldNote.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "Note empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldLangage.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "langue empty", "Attention", JOptionPane.WARNING_MESSAGE);
 		}
 		else {
-			newVideo = new Video (newDoc, Integer.parseInt(fieldDuree.getText()), fieldMentionLegale.getText());
-			String sqltest = "SELECT COUNT(*) AS sum FROM VIDEO where TITRE='"+newVideo.getTitre()+"'";
-			String sqlinsert = "INSERT INTO VIDEO (CODE,TITRE,AUTEUR,ANNEE,EMPRUNTABLE,EMPRUNTE,"
-												+ "NBEMPRUNT,NBEXEMPLAIRE,MENTIONLEGALE,DUREEFILM,DUREEEMPRUNT,TARIF) " +
-	                   "VALUES ('" + newVideo.getCode() + "',"
-	                   		 + "'" + newVideo.getTitre() + "',"
-	                   		 + "'" + newVideo.getAuteur() + "',"
-	                   		 + "'" + newVideo.getAnnee() + "',"
-	                   		 + "'" + newVideo.isEmpruntable() + "',"
-	                   		 + "'" + newVideo.isEmprunte() + "',"
-	                   		 + "'" + newVideo.getNbEmprunt() + "',"
-	                   		 + "'" + newVideo.getNbExemplaire() + "',"
-	                   		 + "'" + newVideo.getMentionLegale() + "',"
-	                   		 + "'" + newVideo.getDureeFilm() + "',"
-	                   		 + "'" + newVideo.getDureeEmprunt() + "',"
-	                   		 + "'" + newVideo.getTarif() + "');"; 
+			/*" TITRE              TEXT    NOT NULL, " +
+                  " ANNEE              TEXT    NOT NULL, " +
+                  " IMAGE              TEXT    NOT NULL, " +
+                  " DESCRIPTION        TEXT    NOT NULL, " +
+                  " LANGUAGE           TEXT    NOT NULL, " +
+                  " NBEMPRUNT          INT     NOT NULL, " +
+                  " NBEXEMPLAIRE       INT     NOT NULL, " +
+                  " NOTE               TEXT    NOT NULL, " +
+                  " TARIF		       INT     NOT NULL) ";*/
+			//newVideo = new Video (newDoc, Integer.parseInt(fieldDuree.getText()), fieldMentionLegale.getText());
+			String sqltest = "SELECT COUNT(*) AS sum FROM VIDEO where TITRE='"+fieldTitre.getText().toString()+"'";
+			String sqlinsert = "INSERT INTO VIDEO (TITRE, ANNEE, IMAGE, DESCRIPTION,LANGUAGE,"
+					+ "NBEMPRUNT, NBEXEMPLAIRE,NOTE,TARIF) " +
+					"VALUES ('" + fieldTitre.getText().toString() + "',"
+					+ "'" + fieldAnnee.getText() + "',"
+					+ "'" + fieldImage.getText().toString() + "',"
+					+ "'" + fieldDescription.getText().toString() + "',"
+					+ "'" + fieldLangage.getText().toString() + "',"
+					+ "'" + fieldNbEmprunt.getText() + "',"
+					+ "'" + fieldNbExemplaire.getText() + "',"
+					+ "'" + fieldNote.getText() + "',"
+					+ "'" + fieldTarif.getText() + "');";
 			sqlHelper.connect();
 			sqlHelper.searchsql(sqltest);
 			if (sqlHelper.getInt("sum")!=0){
@@ -109,6 +112,9 @@ public class AddVideo extends AddDocument implements ActionListener{
 				System.out.println("ajout");
 			}
 			sqlHelper.disconnect();
+			this.dispose();
 		}
+
 	}
+	
 }

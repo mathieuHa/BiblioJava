@@ -1,55 +1,35 @@
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.text.NumberFormat;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class AddLivre extends AddDocument implements ActionListener{
 	private SqlHelper sqlHelper;
-	private JPanel panel;
-	private JPanel panelAddNbPages;
 	
 	
 	private JLabel labelAuteur = new JLabel("Auteur");
 	private JLabel labelAnnee = new JLabel("Annee");
 	private JLabel labelCategory = new JLabel("Categorie");
 	private JLabel labelImage = new JLabel("Image URL");
-	private JLabel labelNbPages = new JLabel("Nb pages");
 	private JLabel labelDescription = new JLabel("Description");
-	private JTextField fieldNbPages = new JTextField();
 	private JTextArea fieldDescription = new JTextArea();
 	private JTextField fieldAuteur = new JTextField();
-	private JTextField fieldAnnee = new JTextField();
+	private JFormattedTextField fieldAnnee = new JFormattedTextField( NumberFormat.getNumberInstance() );
 	private JTextField fieldImage = new JTextField();
 	private JTextField fieldCategory = new JTextField();
 	private Livre newLivre;
-	/*			x  " TITRE              TEXT    NOT NULL, " +
-                  " AUTEUR             TEXT    NOT NULL, " +
-                  " ANNEE              TEXT    NOT NULL, " +
-                  " CATEGORY           TEXT    NOT NULL, " +
-                  " IMAGE              TEXT    NOT NULL, " +
-                  " NBEMPRUNT          INT     NOT NULL, " +
-                x  " NBEXEMPLAIRE       INT     NOT NULL, " +
-                  " DESCRIPTION        TEXT    NOT NULL, " +
-                x  " TARIF		       INT     NOT NULL) ";
-    */
+	
 	public AddLivre() {
 		super("Livre");
-		
 		fieldDescription.setPreferredSize(new Dimension(200, 200));
 		fieldAuteur.setPreferredSize(new Dimension(200, 25));
 		fieldAnnee.setPreferredSize(new Dimension(200, 25));
@@ -78,6 +58,7 @@ public class AddLivre extends AddDocument implements ActionListener{
 		pane.add(fieldDescription, c);
 		
 		this.add(pane, BorderLayout.CENTER);
+		boutonvalider.addActionListener(this);
 		this.add(boutonvalider,BorderLayout.SOUTH);
 		this.setVisible(true);
 	}
@@ -87,25 +68,46 @@ public class AddLivre extends AddDocument implements ActionListener{
 		if (!docIsOK){
 			
 		}
-		else if (fieldNbPages.getText().isEmpty()){
+		else if (fieldAuteur.getText().isEmpty()){
 			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
 		}
-		else {
-			newLivre = new Livre (newDoc, Integer.parseInt(fieldNbPages.getText()));
-			String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+newLivre.getTitre()+"'";
-			String sqlinsert = "INSERT INTO LIVRE (CODE,TITRE,AUTEUR,ANNEE,EMPRUNTABLE,EMPRUNTE,"
-												+ "NBEMPRUNT,NBEXEMPLAIRE,NBPAGE,DUREEEMPRUNT,TARIF) " +
-	                   "VALUES ('" + newLivre.getCode() + "',"
-	                   		 + "'" + newLivre.getTitre() + "',"
-	                   		 + "'" + newLivre.getAuteur() + "',"
-	                   		 + "'" + newLivre.getAnnee() + "',"
-	                   		 + "'" + newLivre.isEmpruntable() + "',"
-	                   		 + "'" + newLivre.isEmprunte() + "',"
-	                   		 + "'" + newLivre.getNbEmprunt() + "',"
-	                   		 + "'" + newLivre.getNbExemplaire() + "',"
-	                   		 + "'" + newLivre.getNbPage() + "',"
-	                   		 + "'" + newLivre.getDureeEmprunt() + "',"
-	                   		 + "'" + newLivre.getTarif() + "');";
+		else if (fieldCategory.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldDescription.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldImage.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (fieldAnnee.getText().isEmpty()){
+			JOptionPane.showMessageDialog(null, "NbPages empty", "Attention", JOptionPane.WARNING_MESSAGE);
+		}
+		/*			x  " TITRE              TEXT    NOT NULL, " +
+        " AUTEUR             TEXT    NOT NULL, " +
+        " ANNEE              TEXT    NOT NULL, " +
+        " CATEGORY           TEXT    NOT NULL, " +
+        " IMAGE              TEXT    NOT NULL, " +
+        " NBEMPRUNT          INT     NOT NULL, " +
+      x  " NBEXEMPLAIRE       INT     NOT NULL, " +
+        " DESCRIPTION        TEXT    NOT NULL, " +
+      x  " TARIF		       INT     NOT NULL) ";
+*/
+		if (arg0.getSource() == boutonvalider) {
+			
+			//newLivre = new Livre (newDoc, Integer.parseInt(fieldNbPages.getText()));
+			String sqltest = "SELECT COUNT(*) AS sum FROM LIVRE where TITRE='"+fieldTitre.getText().toString()+"'";
+			String sqlinsert = "INSERT INTO LIVRE (TITRE, AUTEUR, ANNEE, CATEGORY, IMAGE, NBEMPRUNT,"
+					+ "NBEXEMPLAIRE, DESCRIPTION, TARIF) " +
+	                   "VALUES ('" + fieldTitre.getText().toString() +"',"
+	                   		 + "'" + fieldAuteur.getText().toString() + "',"
+	                   		 + "'" + fieldAnnee.getText() + "',"
+	                   		 + "'" + fieldCategory.getText().toString() + "',"
+	                   		 + "'" + fieldImage.getText().toString() + "',"
+	                   		 + "'" + fieldNbEmprunt.getText() + "',"
+	                   		 + "'" + fieldNbExemplaire.getText() + "',"
+	                   		 + "'" + fieldDescription.getText().toString() + "',"
+	                   		 + "'" + fieldTarif.getText() + "')";
 			sqlHelper.connect();
 			sqlHelper.searchsql(sqltest);
 			if (sqlHelper.getInt("sum")!=0){
@@ -116,6 +118,7 @@ public class AddLivre extends AddDocument implements ActionListener{
 				System.out.println("ajout");
 			}
 			sqlHelper.disconnect();
+			this.dispose();
 		}
 	}
 	
