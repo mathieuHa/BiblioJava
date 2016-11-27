@@ -30,7 +30,7 @@ public class AddJson {
 	private boolean busy = false;
 	private boolean erreur = false;
 	private String inconnu = "unknown";
-	private Connection connexion;
+	private SqlHelper sqlHelper = new SqlHelper();
 
 	public AddJson (){
 		
@@ -53,7 +53,6 @@ public class AddJson {
 	        	erreur = true;
 	        	return 0;
 	        }
-	        //System.exit(-1);
 	        
 	    } catch (MalformedURLException e1) {
 	        e1.printStackTrace();
@@ -63,6 +62,14 @@ public class AddJson {
 	    return 1;
 	}
 	
+	public SqlHelper getSqlHelper() {
+		return sqlHelper;
+	}
+
+	public void setSqlHelper(SqlHelper sqlHelper) {
+		this.sqlHelper = sqlHelper;
+	}
+
 	public String buildRequestBook(String subject) {
 		String s = "https://www.googleapis.com/books/v1/volumes?q="+subject+"&&printType=books&orderBy=newest&maxResults=10&langRestrict=fr&key=AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY";
 		System.out.println(s);
@@ -89,15 +96,12 @@ public class AddJson {
 			is.close();
 			return new JSONArray(new String(buffer,"UTF-8"));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -111,15 +115,12 @@ public class AddJson {
 			is.close();
 			return new JSONObject(new String(buffer,"UTF-8"));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -164,14 +165,7 @@ public class AddJson {
 				+ "'" + language + "',"
 				+ "'" + note + "',"
 				+ "'" + 0 + "');"; 
-		try {
-			Statement stmt = connexion.createStatement();
-			stmt.executeUpdate(sqlinsert);
-			stmt.close();
-		} catch ( Exception e ) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			//System.exit(0);
-		}
+    	sqlHelper.updatesql(sqlinsert);
 		busy = false;
     }
     
@@ -190,7 +184,6 @@ public class AddJson {
     	date = date.replace("'", "''");
     	id = id.replace("'", "''");
     	category = category.replace("'", "''");
-		//String sqltest = "SELECT COUNT(*) AS sum FROM Livre where TITRE='"+title+"'";
 		String sqlinsert = "INSERT INTO LIVRE (TITRE,AUTEUR,ANNEE,CATEGORY,IMAGE,"
 											+ "NBEMPRUNT,NBEXEMPLAIRE,DESCRIPTION,TARIF) " +
                    "VALUES ("
@@ -204,20 +197,7 @@ public class AddJson {
                    		 + "'" + description + "',"
                    		 + "'" + 0 + "');"; 
 		System.out.println(sqlinsert);
-		try {
-			System.out.println("before");
-		      Statement stmt = connexion.createStatement();
-		      System.out.println("in");
-		      stmt.executeUpdate(sqlinsert);
-		      System.out.println("after");
-		      stmt.isCloseOnCompletion();
-		      stmt.close();
-		      System.out.println("afterclose");
-		    } catch ( SQLException e) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      //System.exit(0);
-		    }
-		System.out.println("afterbook");
+		sqlHelper.updatesql(sqlinsert);
 		busy = false;
     }
     
@@ -227,7 +207,6 @@ public class AddJson {
     	album = album.replace("'", "''");
     	image = image.replace("'", "''");
     	auteur = auteur.replace("'", "''");
-    	//id = id.replace("'", "''");
 		String sqlinsert = "INSERT INTO AUDIO (TITRE,AUTEUR,ALBUM,IMAGE,"
 											+ "NBEMPRUNT,NBEXEMPLAIRE,TARIF) " +
                    "VALUES ("
@@ -239,14 +218,7 @@ public class AddJson {
                    		 + "'" + 0 + "',"
                    		 + "'" + 0 + "');"; 
 		System.out.println(sqlinsert);
-		try {
-		      Statement stmt = connexion.createStatement();
-		      stmt.executeUpdate(sqlinsert);
-		      stmt.close();
-		    } catch ( Exception e ) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      //System.exit(0);
-		    }
+		sqlHelper.updatesql(sqlinsert);
 		busy = false;
     }
     
@@ -451,25 +423,5 @@ public class AddJson {
 				}
 			}
 	    }
-    }
-    
-    public void connexion () {
-    	try {
-			Class.forName("org.sqlite.JDBC");
-			connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-		      System.out.println("Opened database successfully dz");
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    public void deconnexion () {
-    	try {
-			Class.forName("org.sqlite.JDBC");
-			connexion.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
     }
 }

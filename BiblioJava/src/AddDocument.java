@@ -1,5 +1,11 @@
+
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,91 +27,58 @@ public class AddDocument extends JFrame implements ActionListener{
 	private JPanel panelAddAuteur;
 	private JPanel panelAddAnnee;
 	private JPanel panelAddNbExemplaire;
-	private JLabel labelTitre;
-	private JLabel labelAuteur;
-	private JLabel labelAnnee;
-	private JLabel labelNbExemplaire;
-	private JTextField fieldTitre;
-	private JTextField fieldAuteur;
-	private JTextField fieldAnnee;
-	private JTextField fieldNbExemplaire;
+	
+	
+	private JLabel labelTitre = new JLabel ("Titre");
+	private JLabel labelNbExemplaire = new JLabel ("Nb d'exemplaires");
+	private JLabel labelTarif = new JLabel ("Tarif");
+	private JLabel labelNbEmprunt = new JLabel("Nb d'emprunts");
+	private JTextField fieldNbEmprunt = new JTextField();
+	private JTextField fieldTitre = new JTextField();
+	private JTextField fieldNbExemplaire = new JTextField();
+	private JTextField fieldTarif = new JTextField();
 	private JPanel contentPane;
+	
+	protected JPanel pane;
+	protected GridBagConstraints c;
 	protected JButton boutonvalider;
 	protected boolean docIsOK;
+	protected SqlHelper sqlHelper = new SqlHelper();
 	public AddDocument(String title) {
 		docIsOK = false;
 		this.setTitle("Add " + title);
-		this.setMinimumSize(new Dimension(450,600));
+		this.setMinimumSize(new Dimension(450,700));
+		this.setLayout(new BorderLayout());
 		boutonvalider = new JButton("Valider");
-		panel = new JPanel ();
-		panel.setLayout(new GridLayout(2,1));
-		panelAdd = new JPanel();
-		panelAdd.setLayout(new GridLayout(4,1));
-		panelAddTitre = new JPanel();
-		panelAddAuteur = new JPanel();
-		panelAddAnnee = new JPanel();
-		panelAddNbExemplaire = new JPanel();
 		
-		panelAddTitre.setLayout(new BoxLayout(panelAddTitre,BoxLayout.X_AXIS));
-		panelAddAuteur.setLayout(new BoxLayout(panelAddAuteur,BoxLayout.X_AXIS));
-		panelAddAnnee.setLayout(new BoxLayout(panelAddAnnee,BoxLayout.X_AXIS));
-		panelAddNbExemplaire.setLayout(new BoxLayout(panelAddNbExemplaire,BoxLayout.X_AXIS));
-		
-		labelTitre = new JLabel ("Titre");
-		labelAuteur = new JLabel ("Auteur");
-		labelAnnee = new JLabel ("Annee");
-		labelNbExemplaire = new JLabel ("Nombre Exemplaires");
-		
-		fieldTitre = new JTextField();
-		fieldAuteur = new JTextField();
-		fieldAnnee = new JTextField();
-		fieldNbExemplaire = new JTextField();
 		fieldTitre.setPreferredSize(new Dimension(200, 25));
-		fieldTitre.setMaximumSize(new Dimension(200, 25));
-		fieldAuteur.setPreferredSize(new Dimension(200, 25));
-		fieldAuteur.setMaximumSize(new Dimension(200, 25));
-		fieldAnnee.setPreferredSize(new Dimension(200, 25));
-		fieldAnnee.setMaximumSize(new Dimension(200, 25));
 		fieldNbExemplaire.setPreferredSize(new Dimension(200, 25));
-		fieldNbExemplaire.setMaximumSize(new Dimension(200, 25));
+		fieldTarif.setPreferredSize(new Dimension(200, 25));
+		fieldNbEmprunt.setPreferredSize(new Dimension(200, 25));
 		
-		panelAddTitre.add(Box.createHorizontalStrut(50));
-		panelAddTitre.add(labelTitre);
-		panelAddTitre.add(Box.createHorizontalGlue());
-		panelAddTitre.add(fieldTitre);
-		panelAddTitre.add(Box.createHorizontalStrut(50));
+		pane = new JPanel();
+		pane.setLayout(new GridBagLayout());
+		c = new GridBagConstraints();
+		c.insets = new Insets(10, 10, 10, 10);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.LINE_START;
 		
-		panelAddAuteur.add(Box.createHorizontalStrut(50));
-		panelAddAuteur.add(labelAuteur);
-		panelAddAuteur.add(Box.createHorizontalGlue());
-		panelAddAuteur.add(fieldAuteur);
-		panelAddAuteur.add(Box.createHorizontalStrut(50));
-		
-		panelAddAnnee.add(Box.createHorizontalStrut(50));
-		panelAddAnnee.add(labelAnnee);
-		panelAddAnnee.add(Box.createHorizontalGlue());
-		panelAddAnnee.add(fieldAnnee);
-		panelAddAnnee.add(Box.createHorizontalStrut(50));
-		
-		panelAddNbExemplaire.add(Box.createHorizontalStrut(50));
-		panelAddNbExemplaire.add(labelNbExemplaire);
-		panelAddNbExemplaire.add(Box.createHorizontalGlue());
-		panelAddNbExemplaire.add(fieldNbExemplaire);
-		panelAddNbExemplaire.add(Box.createHorizontalStrut(50));
-		
-		
-		panelAdd.add(panelAddTitre);
-		panelAdd.add(panelAddAuteur);
-		panelAdd.add(panelAddAnnee);
-		panelAdd.add(panelAddNbExemplaire);
-		
-		
-		panel.add(panelAdd);
-		
-		//boutonvalider.addActionListener(this);
-		
-		this.setContentPane(panel);
-		this.setVisible(true);
+		c.gridx = 0; c.gridy = 0;
+		pane.add(labelTitre,c);
+		c.gridx = 1; c.gridy = 0;
+		pane.add(fieldTitre, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelNbExemplaire, c);
+		c.gridx = 1;
+		pane.add(fieldNbExemplaire, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelTarif, c);
+		c.gridx = 1;
+		pane.add(fieldTarif, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelNbEmprunt, c);
+		c.gridx = 1;
+		pane.add(fieldNbEmprunt, c);
 	}
 	
 	protected void ajouterValiderB (JPanel pane){
@@ -119,22 +92,21 @@ public class AddDocument extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) { // formatter integer only autorisé a faire
-		// TODO Auto-generated method stub
 		if (arg0.getSource() == boutonvalider) {
 			if (fieldTitre.getText().isEmpty()){
 				JOptionPane.showMessageDialog(null, "Titre empty", "Attention", JOptionPane.WARNING_MESSAGE);
 			}
-			else if (fieldAuteur.getText().isEmpty()){
+			else if (fieldNbEmprunt.getText().isEmpty()){
 				JOptionPane.showMessageDialog(null, "Auteur empty", "Attention", JOptionPane.WARNING_MESSAGE);
 			}
-			else if (fieldAnnee.getText().isEmpty()){
+			else if (fieldTarif.getText().isEmpty()){
 				JOptionPane.showMessageDialog(null, "Annee empty", "Attention", JOptionPane.WARNING_MESSAGE);
 			}
 			else if (fieldNbExemplaire.getText().isEmpty()){
 				JOptionPane.showMessageDialog(null, "Nb Exemplaire empty", "Attention", JOptionPane.WARNING_MESSAGE);
 			}
 			else {
-				newDoc = new Document (fieldTitre.getText(),fieldAuteur.getText(),Integer.parseInt(fieldAnnee.getText()),Integer.parseInt(fieldNbExemplaire.getText()));
+				newDoc = new Document (fieldTitre.getText(),fieldNbEmprunt.getText(),Integer.parseInt(fieldTarif.getText()),Integer.parseInt(fieldNbExemplaire.getText()));
 				System.out.println("ok doc");
 				docIsOK = true;
 			}

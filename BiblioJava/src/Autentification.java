@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -66,29 +67,26 @@ public class Autentification implements ActionListener {
 		boutoninscription = new JButton("inscription");
 		boutoninscription.addActionListener(this);
 
-		paneltxt = new JPanel();
-		panelname = new ImagePanel(); 
-		panelpaswd = new JPanel();
-		panelbouton = new JPanel();
+		panelname = new ImagePanel();
 		panelname.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(25,10,10,10);
 
-		c.gridx = 100; c.gridy = 100;
+		c.gridx = 0; c.gridy = 0;
 		panelname.add(textlogin,c);
-		c.gridx = 200; c.gridy = 100;
+		c.gridx = 1; 
 		panelname.add(fieldlogin,c);
-		c.gridx = 100; c.gridy = 200;
+		c.gridx = 0; c.gridy++;
 		panelname.add(textpassword,c);
-		c.gridx = 200; c.gridy = 200;
+		c.gridx = 1;
 		panelname.add(fieldpassword,c);
 		fieldlogin.setPreferredSize(new Dimension(150, 25));
 		fieldlogin.setMaximumSize(fieldlogin.getPreferredSize());
 		fieldpassword.setPreferredSize(new Dimension(150, 25));
 		fieldpassword.setMaximumSize(fieldpassword.getPreferredSize());
-		c.gridx = 100; c.gridy = 300;
+		c.gridx = 0; c.gridy++;
 		panelname.add(boutoninscription,c);
-		c.gridx = 200; c.gridy = 300;
+		c.gridx = 1; 
 		panelname.add(boutonconnexion,c);
 		
 		this.user = user;

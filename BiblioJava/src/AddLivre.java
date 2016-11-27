@@ -1,3 +1,4 @@
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -13,44 +14,72 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class AddLivre extends AddDocument implements ActionListener{
-
+	private SqlHelper sqlHelper;
 	private JPanel panel;
 	private JPanel panelAddNbPages;
-	private JLabel labelNbPages;
-	private JTextField fieldNbPages;
+	
+	
+	private JLabel labelAuteur = new JLabel("Auteur");
+	private JLabel labelAnnee = new JLabel("Annee");
+	private JLabel labelCategory = new JLabel("Categorie");
+	private JLabel labelImage = new JLabel("Image URL");
+	private JLabel labelNbPages = new JLabel("Nb pages");
+	private JLabel labelDescription = new JLabel("Description");
+	private JTextField fieldNbPages = new JTextField();
+	private JTextArea fieldDescription = new JTextArea();
+	private JTextField fieldAuteur = new JTextField();
+	private JTextField fieldAnnee = new JTextField();
+	private JTextField fieldImage = new JTextField();
+	private JTextField fieldCategory = new JTextField();
 	private Livre newLivre;
-
+	/*			x  " TITRE              TEXT    NOT NULL, " +
+                  " AUTEUR             TEXT    NOT NULL, " +
+                  " ANNEE              TEXT    NOT NULL, " +
+                  " CATEGORY           TEXT    NOT NULL, " +
+                  " IMAGE              TEXT    NOT NULL, " +
+                  " NBEMPRUNT          INT     NOT NULL, " +
+                x  " NBEXEMPLAIRE       INT     NOT NULL, " +
+                  " DESCRIPTION        TEXT    NOT NULL, " +
+                x  " TARIF		       INT     NOT NULL) ";
+    */
 	public AddLivre() {
 		super("Livre");
 		
-		panel = new JPanel(new GridLayout(4,1));
-		panelAddNbPages = new JPanel();
+		fieldDescription.setPreferredSize(new Dimension(200, 200));
+		fieldAuteur.setPreferredSize(new Dimension(200, 25));
+		fieldAnnee.setPreferredSize(new Dimension(200, 25));
+		fieldImage.setPreferredSize(new Dimension(200, 25));
+		fieldCategory.setPreferredSize(new Dimension(200, 25));
 		
-		panelAddNbPages.setLayout(new BoxLayout(panelAddNbPages,BoxLayout.X_AXIS));
+		c.gridx = 0; c.gridy++;
+		pane.add(labelAuteur,c);
+		c.gridx = 1;
+		pane.add(fieldAuteur, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelAnnee, c);
+		c.gridx = 1;
+		pane.add(fieldAnnee, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelImage, c);
+		c.gridx = 1;
+		pane.add(fieldImage, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelCategory, c);
+		c.gridx = 1;
+		pane.add(fieldCategory, c);
+		c.gridx = 0; c.gridy++;
+		pane.add(labelDescription, c);
+		c.gridx = 1; 
+		pane.add(fieldDescription, c);
 		
-		labelNbPages = new JLabel ("NbPages");
-		
-		fieldNbPages = new JTextField();
-		
-		fieldNbPages.setPreferredSize(new Dimension(200, 25));
-		fieldNbPages.setMaximumSize(new Dimension(200, 25));
-		
-		panelAddNbPages.add(Box.createHorizontalStrut(50));
-		panelAddNbPages.add(labelNbPages);
-		panelAddNbPages.add(Box.createHorizontalGlue());
-		panelAddNbPages.add(fieldNbPages);
-		panelAddNbPages.add(Box.createHorizontalStrut(50));
-		
-		panel.add(panelAddNbPages);
-		boutonvalider.addActionListener(this);
-		super.ajouterValiderB(panel);
-		this.getContentPane().add(panel,BorderLayout.CENTER);
-		
-		// TODO Auto-generated constructor stub
+		this.add(pane, BorderLayout.CENTER);
+		this.add(boutonvalider,BorderLayout.SOUTH);
+		this.setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent arg0) { // formatter integer only autorisé a faire
@@ -76,27 +105,17 @@ public class AddLivre extends AddDocument implements ActionListener{
 	                   		 + "'" + newLivre.getNbExemplaire() + "',"
 	                   		 + "'" + newLivre.getNbPage() + "',"
 	                   		 + "'" + newLivre.getDureeEmprunt() + "',"
-	                   		 + "'" + newLivre.getTarif() + "');"; 
-			try {
-			      Class.forName("org.sqlite.JDBC");
-			      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
-			      System.out.println("Opened database successfully");
-			      Statement stmt = connexion.createStatement();
-			      ResultSet rs = stmt.executeQuery(sqltest);
-			      //System.out.println(rs.getInt("sum"));
-			      if (rs.getInt("sum")!=0){
-			    	  System.out.println("existe deja");
-			    	  JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
-			      } else {
-			    	  stmt.executeUpdate(sqlinsert);
-			    	  System.out.println("ajout");
-			      }
-			      stmt.close();
-			      connexion.close();
-			    } catch ( Exception e ) {
-			      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			      System.exit(0);
-			    }
+	                   		 + "'" + newLivre.getTarif() + "');";
+			sqlHelper.connect();
+			sqlHelper.searchsql(sqltest);
+			if (sqlHelper.getInt("sum")!=0){
+				System.out.println("existe deja");
+				JOptionPane.showMessageDialog(null, "titre already exist", "Attention", JOptionPane.WARNING_MESSAGE);
+			} else {
+				sqlHelper.updatesql(sqlinsert);
+				System.out.println("ajout");
+			}
+			sqlHelper.disconnect();
 		}
 	}
 	

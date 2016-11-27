@@ -6,7 +6,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -37,6 +40,7 @@ public class ObjList {
 	private boolean cancel = false;
 	private String bd;
 	private String id;
+	private SimpleDateFormat formater;
 	
 	public void Sstart (String dateF){
 		sw = new SwingWorker<Object, Object>(){
@@ -44,7 +48,7 @@ public class ObjList {
 			protected Object doInBackground() throws Exception {
 				while (cancel == false){
 					Thread.sleep(100);
-					labelTimer.setText(Biblio.compteur(dateF));
+					labelTimer.setText(compteur(dateF));
 					labelTimer.updateUI();
 				}
 				return cancel;
@@ -100,7 +104,7 @@ public class ObjList {
 		labeldateFin = new JLabel(dateFin.toString());
 		//NbE = new JLabel("" + nbExemplaire);
 		buttonVP = new JButton("Voir Plus");
-		setLabelTimer(new JLabel(Biblio.compteur(dateFin)));
+		setLabelTimer(new JLabel(compteur(dateFin)));
 		obj.add(Box.createHorizontalStrut(25));
 		obj.add(labeltitle);
 		obj.add(Box.createHorizontalStrut(width/7-30));
@@ -246,6 +250,29 @@ public class ObjList {
 		obj.add(Box.createHorizontalStrut(width/7-(int)NbE.getPreferredSize().getWidth()));
 		obj.add(bouton);
 		return obj;
+	}
+	
+	public String compteur (String end){
+		formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date datenow = new Date();
+		Date dateEnd = null;
+		try {
+			dateEnd = formater.parse(end);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		long time =  dateEnd.getTime() - datenow.getTime();
+		long day  = 0;
+		long hour = 0;
+		long min  = 0;
+		long sec  = 0;
+		datenow.setTime(time);
+		time/=1000;
+		day = time/(24*60*60);
+		hour = time / (60*60) - day*24;
+		min = time / 60 - hour*60 - day*24*60;
+		sec = time - day*24*60*60 - hour*60*60 - min*60;
+		return day + " jours " + hour + ":" + min + ":" + sec;
 	}
 	
 	public JLabel getLabeltitle() {

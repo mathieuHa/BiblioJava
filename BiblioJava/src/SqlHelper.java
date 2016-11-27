@@ -16,10 +16,8 @@ public class SqlHelper {
 			connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
 			stmt = connexion.createStatement();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
 	}
@@ -29,7 +27,6 @@ public class SqlHelper {
 			stmt.close();
 			connexion.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -39,7 +36,6 @@ public class SqlHelper {
 		try {
 			rs = stmt.executeQuery(sqlsearch);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +44,6 @@ public class SqlHelper {
 		try {
 			stmt.execute(sqlupdate);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -57,7 +52,6 @@ public class SqlHelper {
 		try {
 			return rs.next();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -67,7 +61,6 @@ public class SqlHelper {
 		try {
 			return rs.getInt(value);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
@@ -77,7 +70,6 @@ public class SqlHelper {
 		try {
 			return rs.getString(value);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return "";
@@ -138,6 +130,23 @@ public class SqlHelper {
 	     this.updatesql(sqlaudio);
 	     this.updatesql(sqlvideo);
 	     this.updatesql(sqllogin);
+	}
+	
+	public void fillTables (){
+		this.connect();
+		String sqlaudiorequest = "UPDATE AUDIO SET NBEXEMPLAIRE = 2";
+		String sqlvideorequest = "UPDATE VIDEO SET NBEXEMPLAIRE = 2";
+		String sqllivrerequest = "UPDATE LIVRE SET NBEXEMPLAIRE = 2";
+		String sqlaudiorequest1 = "UPDATE AUDIO SET TARIF = 1";
+		String sqlvideorequest1 = "UPDATE VIDEO SET TARIF = 3";
+		String sqllivrerequest1 = "UPDATE LIVRE SET TARIF = 2";
+		this.updatesql(sqllivrerequest1);
+		this.updatesql(sqllivrerequest);
+		this.updatesql(sqlaudiorequest1);
+		this.updatesql(sqlaudiorequest1);
+		this.updatesql(sqlvideorequest1);
+		this.updatesql(sqlvideorequest1);
+		this.disconnect();
 	}
 	
 }

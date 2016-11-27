@@ -22,7 +22,7 @@ public class DownloadItem {
 			@Override
 			protected Void doInBackground() throws Exception {
 				// TODO Auto-generated method stub
-				ad.connexion();
+				ad.getSqlHelper().connect();
 				for (int i = 1; i<10; i++){
 					for (int j = 1; j<1000; j++)
 						s = scanner.nextLine();
@@ -32,7 +32,7 @@ public class DownloadItem {
 					ad.addMusic(s);
 					setProgress(i);
 				}
-				ad.deconnexion();
+				ad.getSqlHelper().disconnect();
 				return null;
 			}
 			@Override

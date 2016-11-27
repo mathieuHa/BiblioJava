@@ -9,6 +9,13 @@ public class User {
 	private int credit;
 	private int id;
 	
+	public void buyCredit (int credit, SqlHelper sqlHelper) {
+		sqlHelper.connect();
+		String addCredit = "UPDATE FROM LOGIN SET CREDIT ="+ (this.getCredit() + credit) +" WHERE id ="+ getId();
+		sqlHelper.updatesql(addCredit);
+		sqlHelper.disconnect();
+	}
+	
 	public User(String login) {
 		super();
 		this.username = login;

@@ -119,7 +119,7 @@ public class Biblio implements ActionListener{
 	private ResultSet rs;
 	
 	public Biblio () {
-		fill_tables();
+		sqlHelper.fillTables();
 	    connection ();
 	    lButtonV = new ArrayList<JButton>();
 	    lIntegerV = new ArrayList<Integer>();
@@ -130,8 +130,6 @@ public class Biblio implements ActionListener{
 	    lButtonC = new ArrayList<JButton>();
 	    lIntegerC = new ArrayList<Integer>();
 	    lobj = new ArrayList<ObjList>();
-	    
-		System.out.println("OK");
 	}
 
 	
@@ -162,23 +160,6 @@ public class Biblio implements ActionListener{
 	      sw.execute();
 	}
 	
-	public void fill_tables (){
-		sqlHelper.connect();
-		String sqlaudiorequest = "UPDATE AUDIO SET NBEXEMPLAIRE = 2";
-		String sqlvideorequest = "UPDATE VIDEO SET NBEXEMPLAIRE = 2";
-		String sqllivrerequest = "UPDATE LIVRE SET NBEXEMPLAIRE = 2";
-		String sqlaudiorequest1 = "UPDATE AUDIO SET TARIF = 1";
-		String sqlvideorequest1 = "UPDATE VIDEO SET TARIF = 3";
-		String sqllivrerequest1 = "UPDATE LIVRE SET TARIF = 2";
-		sqlHelper.updatesql(sqllivrerequest1);
-		sqlHelper.updatesql(sqllivrerequest);
-		sqlHelper.updatesql(sqlaudiorequest1);
-		sqlHelper.updatesql(sqlaudiorequest1);
-		sqlHelper.updatesql(sqlvideorequest1);
-		sqlHelper.updatesql(sqlvideorequest1);
-		sqlHelper.disconnect();
-	}
-	
 	private void setupFrameUI () {
 		frame = new JFrame ("LibraryGUI");
 		frame.setMinimumSize(new Dimension(1200,800));
@@ -189,20 +170,9 @@ public class Biblio implements ActionListener{
 		panelbouton = new JPanel();
 		panelbouton.setBackground(Color.gray);	
 	    obj = new ObjList();
-	    panelbouton.add(boutonCompte);
-	    panelbouton.add(boutonMusique);
-	    panelbouton.add(boutonLivre);
-	    panelbouton.add(boutonVideo);
-	    
 	    panel = new JPanel();
 	    panel.setLayout(cl);
 	    
-	    
-	    
-	    frame.add(panelbouton, BorderLayout.NORTH);
-	    frame.add(panel, BorderLayout.CENTER);
-		frame.setVisible(true);
-
 	}
 	
 	private void setupFilmUI () {
@@ -369,6 +339,7 @@ public class Biblio implements ActionListener{
 	    boutonCompte.addActionListener(this);
 	    
 	    panelcompte.add(panelFiches,BorderLayout.CENTER);
+	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
 	    
 	}
 	
@@ -377,6 +348,17 @@ public class Biblio implements ActionListener{
 	    panel.add(panellivre, "livre");
 	    panel.add(panelmusique, "musique");
 	    panel.add(panelfilms, "video");
+	    
+	    panelbouton.add(boutonCompte);
+	    panelbouton.add(boutonMusique);
+	    panelbouton.add(boutonLivre);
+	    panelbouton.add(boutonVideo);
+	    
+	    
+	    
+	    frame.add(panelbouton, BorderLayout.NORTH);
+	    frame.add(panel, BorderLayout.CENTER);
+		frame.setVisible(true);
 	}
 	 
 	public void afficheLibrairy (){
@@ -392,28 +374,7 @@ public class Biblio implements ActionListener{
 		//AIzaSyAT7eTEjPXHy8XGbk5-_thfHG638n_fcYY
 	}
 	
-	public static String compteur (String end){
-		formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		Date datenow = new Date();
-		Date dateEnd = null;
-		try {
-			dateEnd = formater.parse(end);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		long time =  dateEnd.getTime() - datenow.getTime();
-		long day  = 0;
-		long hour = 0;
-		long min  = 0;
-		long sec  = 0;
-		datenow.setTime(time);
-		time/=1000;
-		day = time/(24*60*60);
-		hour = time / (60*60) - day*24;
-		min = time / 60 - hour*60 - day*24*60;
-		sec = time - day*24*60*60 - hour*60*60 - min*60;
-		return day + " jours " + hour + ":" + min + ":" + sec;
-	}
+	
 	
 	
 
@@ -431,7 +392,6 @@ public class Biblio implements ActionListener{
 	        for (ObjList o : lobj) o.setCancel(true); 
 			lobj.clear();
 		    while ( sqlHelper.getNext() && nbResult <8) {
-		    	System.out.println(compteur (sqlHelper.getString("datefin")));
 		    	obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),frame.getWidth()-100,panelFiches);
 		    	obj.Sstart(sqlHelper.getString("datefin"));
 		    	lButtonC.add(obj.getButtonVP());
