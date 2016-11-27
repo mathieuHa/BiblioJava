@@ -1,12 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -36,10 +37,16 @@ public class PanelBiblioUi implements ActionListener{
 	private SqlHelper sqlHelper;
 	private ArrayList<JButton> lButton;
 	private ArrayList<Integer> lInteger;
+	private ArrayList<ObjList> lobj;
 	private ObjList obj;
 	private JFrame frame;
 	private User user;
 	private String bd;
+	private String sqlsearch;
+	private JPanel panelFicheVoir;
+	private JLabel labelMesFiches;
+	private Container panelFiches;
+	private JPanel panelTitre;
 	
 	
 
@@ -51,6 +58,7 @@ public class PanelBiblioUi implements ActionListener{
 		this.bd = bd;
 		lButton = new ArrayList<JButton>();
 	    lInteger = new ArrayList<Integer>();
+	    lobj = new ArrayList<ObjList>();
 		panel = new JPanel();
 		panelSearch = new JPanel();
 	    panel.setBackground(Color.pink);	
@@ -69,10 +77,19 @@ public class PanelBiblioUi implements ActionListener{
 	    
 	    jlb = new JLabel   ("Recherche   " + titre);
 	    
-	    panelSearch.add(jlb);
-	    panelSearch.add(jtf);
-	    panelSearch.add(boutonOK);
-	    
+	    if (user.getUsername().equals("ADMIN"))	{
+	    	labelMesFiches = new JLabel ("Les Utilisateurs");
+	    }
+	    else{
+	    	labelMesFiches = new JLabel ("Mes Fiches Emprunts");
+	    }
+	    labelMesFiches.setFont(new Font(labelMesFiches.getFont().getFontName(),Font.ROMAN_BASELINE,24));
+	    if (bd.equals("FICHE")||bd.equals("LOGIN")) panelSearch.add(labelMesFiches);
+	    else {
+	    	panelSearch.add(jlb);
+	    	panelSearch.add(jtf);
+	    	panelSearch.add(boutonOK);
+	    }
 	    panel.add(panelSearch,BorderLayout.NORTH);
 	    
 	    panelResult = new JPanel(new GridLayout(6,1));
@@ -82,7 +99,8 @@ public class PanelBiblioUi implements ActionListener{
 	    boutonReset = new JButton("ici");
 	    boutonReset.addActionListener(this);
 	    
-	    panelhelp = obj.helpVideo(frame.getWidth()-100,boutonReset); 
+	    selectPanelHelper();
+	    
 	    
 	    panelResult.add(panelhelp);
 	    panel.add(panelResult,BorderLayout.CENTER);
@@ -150,14 +168,14 @@ public class PanelBiblioUi implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.getSource() == boutonOK){
 			nbResult = 0;
 			clearSearch(panelResult,panelhelp);
 			lButton.clear();
 			lInteger.clear();
+			//lobj.clear();
 			sqlHelper.connect();
-			String sqlsearch = "SELECT * FROM " + bd + " where TITRE LIKE '" +"%"+ jtf.getText() +"%"+ "'";
+			sqlsearch = "SELECT * FROM " + bd + " where TITRE LIKE '" +"%"+ jtf.getText() +"%"+ "'";
 			System.out.println(sqlsearch);
 			sqlHelper.searchsql(sqlsearch);
 			while ( sqlHelper.getNext() && nbResult <5) {
@@ -170,7 +188,48 @@ public class PanelBiblioUi implements ActionListener{
 			sqlHelper.disconnect();
 			panelResult.updateUI();
 		}
-		else if (boutonReset == arg0.getSource()){
+		if (arg0.getSource() == bouton && bouton.getText().equals("Compte") && user.getUsername().equals("ADMIN")){
+			nbResult = 0;
+			clearSearch(panelResult,panelhelp);
+			lButton.clear();
+			lInteger.clear();
+			sqlHelper.connect();
+			sqlsearch = "SELECT * FROM LOGIN";
+			System.out.println(sqlsearch);
+			sqlHelper.searchsql(sqlsearch);
+			while ( sqlHelper.getNext() && nbResult <5) {
+				selectBDDObject();
+				lButton.add(obj.getButtonVP());
+				lInteger.add(sqlHelper.getInt("id"));
+				obj.getButtonVP().addActionListener(this);
+				nbResult++;
+			}
+			sqlHelper.disconnect();
+			panelResult.updateUI();
+		}
+		else if (arg0.getSource() == bouton && bouton.getText().equals("Compte")) {
+			nbResult = 0;
+	        clearSearch(panelResult,panelhelp);
+	        lButton.clear();
+	        lInteger.clear();
+	        String sqlsearch = "SELECT * FROM FICHE where userid="+user.getId();
+	        sqlHelper.connect();
+			sqlHelper.searchsql(sqlsearch);
+	        for (ObjList o : lobj) o.setCancel(true); 
+			lobj.clear();
+		    while ( sqlHelper.getNext() && nbResult <5) {
+		    	obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),frame.getWidth()-100,panelResult);
+		    	obj.Sstart(sqlHelper.getString("datefin"));
+		    	lButton.add(obj.getButtonVP());
+		    	lInteger.add(sqlHelper.getInt("id"));
+		    	obj.getButtonVP().addActionListener(this);
+		    	nbResult++;
+		    	lobj.add(obj);
+			}
+		    sqlHelper.disconnect();
+			panel.updateUI();
+			obj.updateTitre(lobj);
+		} else if (boutonReset == arg0.getSource()){
 			clearSearch(panelResult,panelhelp);
 			panelResult.updateUI();
 		}
@@ -190,9 +249,18 @@ public class PanelBiblioUi implements ActionListener{
 			obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("album"),sqlHelper.getString("auteur"),"",sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panelResult,frame.getWidth()-100);
 		} else if (bd.equals("VIDEO")) {
 			obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("description"),sqlHelper.getString("annee"),sqlHelper.getString("note"),sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panelResult,frame.getWidth()-100);
-		} else {
+		} else if (bd.equals("LIVRE")) {
 			obj = new ObjList(sqlHelper.getString("titre"),sqlHelper.getString("auteur"),sqlHelper.getString("annee"),sqlHelper.getString("category"),sqlHelper.getString("image"),sqlHelper.getInt("nbExemplaire"),panelResult,frame.getWidth()-100);
+		} else if (bd.equals("FICHE")){
+			obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),frame.getWidth()-100,panelResult);
+	    	obj.Sstart(sqlHelper.getString("datefin"));
+	    	lobj.add(obj);
+		} else if (bd.equals("LOGIN")){
+			obj = new ObjList(sqlHelper.getString("username"),"",sqlHelper.getInt("credit"),frame.getWidth()-100,panelResult);
+	    	//obj.Sstart(sqlHelper.getString("datefin"));
+	    	//lobj.add(obj);
 		}
+		
 	}
 	
 	private void selectBDDFiche (int cpt) {
@@ -200,10 +268,67 @@ public class PanelBiblioUi implements ActionListener{
 			new FicheMusique(lInteger.get(cpt-1).intValue(),user);
 		} else if (bd.equals("VIDEO")) {
 			new FicheVid(lInteger.get(cpt-1).intValue(),user);
-		} else {
+		} else if (bd.equals("LIVRE")){
 			new FicheLivre(lInteger.get(cpt-1).intValue(),user);
+		} else if (bd.equals("FICHE")){
+			new FicheEmprunt(lInteger.get(cpt-1).intValue(),user);
+		} else if (bd.equals("LOGIN")){
+			this.afficheEmprunt(user,lInteger.get(cpt-1).intValue());
 		}
 	}
+	
+	private void afficheEmprunt(User user, int id){
+		JFrame fr = new JFrame ("Emprunts");
+		fr.setSize(1000, 600);
+		JPanel pan = new JPanel(new GridLayout(12,1));
+		nbResult = 0;
+		panelTitre = new JPanel();
+        panelTitre.add(new JLabel("Liste des Emprunts"));
+        panelTitre.setBackground(Color.LIGHT_GRAY);
+        pan.add(panelTitre);
+        pan.add(obj.helpFiche(fr.getWidth()+200, null));
+        String sqlsearch = "SELECT * FROM FICHE where userid="+id;
+        System.out.println(sqlsearch);
+        sqlHelper.connect();
+		sqlHelper.searchsql(sqlsearch);
+		System.out.println("kk");
+        for (ObjList o : lobj) o.setCancel(true); 
+		//lobj.clear();
+	    while ( sqlHelper.getNext() && nbResult <10) {
+	    	obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),fr.getWidth()+200,pan);
+	    	obj.Sstart(sqlHelper.getString("datefin"));
+	    	obj.getButtonVP().setVisible(false);
+	    	//lButton.add(obj.getButtonVP());
+	    	//lInteger.add(sqlHelper.getInt("id"));
+	    	//obj.getButtonVP().addActionListener(this);
+	    	nbResult++;
+	    	System.out.println("kk");
+	    	lobj.add(obj);
+		}
+	    sqlHelper.disconnect();
+		pan.updateUI();
+		fr.add(pan);
+		obj.updateTitre(lobj);
+		fr.setResizable(false);
+		fr.setVisible(true);
+		
+		
+	}
+	
+	private void selectPanelHelper(){
+		if (bd.equals("AUDIO")){
+			panelhelp = obj.helpMusique(frame.getWidth()-100,boutonReset);
+		} else if (bd.equals("VIDEO")) {
+			panelhelp = obj.helpVideo(frame.getWidth()-100,boutonReset);
+		} else if (bd.equals("LIVRE")){
+			panelhelp = obj.helpLivre(frame.getWidth()-100,boutonReset);
+		} else if (bd.equals("FICHE")){
+			panelhelp = obj.helpFiche(frame.getWidth()-100,boutonReset);
+		} else if (bd.equals("LOGIN")){
+			panelhelp = obj.helpAdmin(frame.getWidth()-100,boutonReset);
+		} else panelhelp = obj.helpLivre(frame.getWidth()-100,boutonReset);
+	}
+	
 	
 	public void clearSearch (JPanel paneR, JPanel paneAdd){
 		paneR.removeAll();

@@ -1,4 +1,5 @@
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -29,7 +31,7 @@ public class Autentification implements ActionListener {
 	private JFrame frame;
 	private JPanel panelbouton;
 	private JTextField fieldlogin;
-	private JTextField fieldpassword;
+	private JPasswordField fieldpassword;
 	private JLabel textlogin;
 	private JLabel textpassword;
 	private JButton boutonconnexion;
@@ -51,6 +53,7 @@ public class Autentification implements ActionListener {
 		line = BorderFactory.createLineBorder(Color.WHITE, 3);
 		frame = new JFrame ("Autentification");
 		frame.setMinimumSize(new Dimension(640,350));
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		
@@ -70,7 +73,7 @@ public class Autentification implements ActionListener {
 		textpassword.setBackground(Color.WHITE);
 		textpassword.setBorder(line);
 		fieldlogin = new JTextField();
-		fieldpassword = new JTextField();
+		fieldpassword = new JPasswordField();
 		
 		boutonconnexion = new JButton("connexion");
 		boutonconnexion.addActionListener(this);

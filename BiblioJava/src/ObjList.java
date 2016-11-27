@@ -41,6 +41,8 @@ public class ObjList {
 	private String bd;
 	private String id;
 	private SimpleDateFormat formater;
+	private JLabel labelname;
+	private JLabel labelCredit;
 	
 	public void Sstart (String dateF){
 		sw = new SwingWorker<Object, Object>(){
@@ -48,6 +50,7 @@ public class ObjList {
 			protected Object doInBackground() throws Exception {
 				while (cancel == false){
 					Thread.sleep(100);
+					//System.out.println(compteur(dateF));
 					labelTimer.setText(compteur(dateF));
 					labelTimer.updateUI();
 				}
@@ -62,7 +65,7 @@ public class ObjList {
 	}
 	
 	public void updateTitre (ArrayList<ObjList> objL) {
-		int sizetext = 30;
+		int sizetext = 20;
 		try {
 		      Class.forName("org.sqlite.JDBC");
 		      Connection connexion = DriverManager.getConnection("jdbc:sqlite:biblio.db");
@@ -100,22 +103,42 @@ public class ObjList {
 		obj.setLayout(new BoxLayout(obj,BoxLayout.X_AXIS));
 		labeltype = new JLabel (type);
 		labeltitle = new JLabel(titre);
+		labeltitle.setMaximumSize(new Dimension (120,20));
 		labeldateEmprunt = new JLabel (dateEmprunt.toString());
 		labeldateFin = new JLabel(dateFin.toString());
-		//NbE = new JLabel("" + nbExemplaire);
 		buttonVP = new JButton("Voir Plus");
 		setLabelTimer(new JLabel(compteur(dateFin)));
 		obj.add(Box.createHorizontalStrut(25));
 		obj.add(labeltitle);
-		obj.add(Box.createHorizontalStrut(width/7-30));
+		obj.add(Box.createHorizontalStrut((int) (width/7-labeltitle.getMaximumSize().getWidth())));
 		obj.add(labeltype);
 		obj.add(Box.createHorizontalStrut(width/7-(int)labeltype.getPreferredSize().getWidth()));
 		obj.add(labeldateEmprunt);
-		obj.add(Box.createHorizontalStrut(width/7-(int)labeldateEmprunt.getPreferredSize().getWidth()));
+		obj.add(Box.createHorizontalStrut(width/6-(int)labeldateEmprunt.getPreferredSize().getWidth()));
 		obj.add(labeldateFin);
-		obj.add(Box.createHorizontalStrut(width/7-(int)labeldateFin.getPreferredSize().getWidth()));
+		obj.add(Box.createHorizontalStrut(width/6-(int)labeldateFin.getPreferredSize().getWidth()));
 		obj.add(labelTimer);
-		obj.add(Box.createHorizontalStrut(width/7));
+		obj.add(Box.createHorizontalStrut(width/6-(int)labelTimer.getPreferredSize().getWidth()));
+		obj.add(buttonVP);
+		obj.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		Pane.add(obj);
+		System.out.println("finobj");
+	}
+	
+	public ObjList (String name, String type, int credit, int width, JPanel Pane)
+	{
+		bd = type;
+		obj = new JPanel();
+		obj.setLayout(new BoxLayout(obj,BoxLayout.X_AXIS));
+		labeltype = new JLabel (type);
+		labelname = new JLabel(name);
+		labelCredit = new JLabel(String.valueOf(credit));
+		buttonVP = new JButton("Voir Plus");
+		obj.add(Box.createHorizontalStrut(75));
+		obj.add(labelname);
+		obj.add(Box.createHorizontalStrut((int) (width/3-labelname.getPreferredSize().getWidth())));
+		obj.add(labelCredit);
+		obj.add(Box.createHorizontalStrut((int) (width/3-labelCredit.getPreferredSize().getWidth())));
 		obj.add(buttonVP);
 		obj.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		Pane.add(obj);
@@ -199,6 +222,52 @@ public class ObjList {
 		return obj;
 	}
 	
+	public JPanel helpAdmin(int width, JButton bouton)
+	{
+		obj = new JPanel();
+		obj.setLayout(new BoxLayout(obj,BoxLayout.X_AXIS));
+		labeltype = new JLabel ("");
+		labelname = new JLabel("Nom de l'utilisateur");
+		labelCredit = new JLabel(String.valueOf("Credits"));
+		buttonVP = new JButton("Voir Plus");
+		obj.add(Box.createHorizontalStrut(75));
+		obj.add(labelname);
+		obj.add(Box.createHorizontalStrut((int) (width/3-labelname.getPreferredSize().getWidth())));
+		obj.add(labelCredit);
+		obj.add(Box.createHorizontalStrut((int) (width/3-labelCredit.getPreferredSize().getWidth())));
+		//obj.add(buttonVP);
+		obj.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		//Pane.add(obj);
+		System.out.println("finobj");
+		return obj;
+	}
+	
+	public JPanel helpFiche(int width, JButton bouton)
+	{
+		obj = new JPanel();
+		obj.setLayout(new BoxLayout(obj,BoxLayout.X_AXIS));
+		labeltype = new JLabel ("Type Document");
+		labeltitle = new JLabel("Titre");
+		labeltitle.setMaximumSize(new Dimension (120,20));
+		labeldateEmprunt = new JLabel ("Date Emprunt");
+		labeldateFin = new JLabel("Date de fin");
+		buttonVP = new JButton("Voir Plus");
+		setLabelTimer(new JLabel("Temps Restant"));
+		obj.add(Box.createHorizontalStrut(25));
+		obj.add(labeltitle);
+		obj.add(Box.createHorizontalStrut((int) (width/7-labeltitle.getMaximumSize().getWidth())));
+		obj.add(labeltype);
+		obj.add(Box.createHorizontalStrut(width/7-(int)labeltype.getPreferredSize().getWidth()));
+		obj.add(labeldateEmprunt);
+		obj.add(Box.createHorizontalStrut(width/6-(int)labeldateEmprunt.getPreferredSize().getWidth()));
+		obj.add(labeldateFin);
+		obj.add(Box.createHorizontalStrut(width/6-(int)labeldateFin.getPreferredSize().getWidth()));
+		obj.add(labelTimer);
+		//obj.add(Box.createHorizontalStrut(width/6-(int)labelTimer.getPreferredSize().getWidth()));
+		return obj;
+	}
+
+	
 	public JPanel helpMusique(int width, JButton bouton)
 	{
 		obj = new JPanel();
@@ -268,11 +337,11 @@ public class ObjList {
 		long sec  = 0;
 		datenow.setTime(time);
 		time/=1000;
-		day = time/(24*60*60);
+		day = time/(24*60*60); 
 		hour = time / (60*60) - day*24;
 		min = time / 60 - hour*60 - day*24*60;
 		sec = time - day*24*60*60 - hour*60*60 - min*60;
-		return day + " jours " + hour + ":" + min + ":" + sec;
+		return String.format("%02d", day) + " jours " + String.format("%02d", hour) + ":" + String.format("%02d", min) + ":" + String.format("%02d", sec);
 	}
 	
 	public JLabel getLabeltitle() {

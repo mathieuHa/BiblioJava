@@ -1,40 +1,27 @@
+
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-public class ImagePanel extends JPanel
- {
-   public Image image;
-   BorderLayout borderLayout1 = new BorderLayout();
- 
-   public ImagePanel()
-   {
-     image = Toolkit.getDefaultToolkit().getImage("lib.jpg");
-     System.out.println(image); 
-    try
-    {
-      jbInit();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-   }
- 
-   public void paintComponent(Graphics g)
-   {
-     super.paintComponent(g);
- 
-     int imageWight = image.getWidth(this);
-     int imageHeight = image.getHeight(this);
-     
-     g.drawImage (image, 0, 0, null);
-     repaint();
-   }
-  private void jbInit() throws Exception
-  {
-    this.setLayout(borderLayout1);
-  }
- }
+
+public class ImagePanel extends JPanel{
+	private BufferedImage image;
+	public ImagePanel() {
+		try {
+			image = ImageIO.read(new File("img.jpg"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.drawImage(image, 0, 0, null);
+	}
+}

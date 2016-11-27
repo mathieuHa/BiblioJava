@@ -143,9 +143,9 @@ public class SqlHelper {
 		this.updatesql(sqllivrerequest1);
 		this.updatesql(sqllivrerequest);
 		this.updatesql(sqlaudiorequest1);
-		this.updatesql(sqlaudiorequest1);
+		this.updatesql(sqlaudiorequest);
 		this.updatesql(sqlvideorequest1);
-		this.updatesql(sqlvideorequest1);
+		this.updatesql(sqlvideorequest);
 		this.disconnect();
 	}
 	

@@ -52,12 +52,15 @@ public class FicheEmprunt implements ActionListener{
 	private String fin;
 	private String prenom;
 	private String titre;
-	private JButton annuler = new JButton("Annuler");
-	private JButton ok = new JButton("Ok");
+	private JButton annuler = new JButton("Annuler l'Emprunt");
+	private JButton ok = new JButton("Fermer");
 	private JPanel pButton = new JPanel();
 
-	public FicheEmprunt () {
-
+	public FicheEmprunt (int docId, User user) {
+		this.sqlHelper = new SqlHelper();
+		this.user = user;
+		this.docId = docId;
+		this.addUI();
 	}
 	public static Date ajouterJouretSemaine(Date date, int nbDay, int nbWeek) {
 		Calendar cal = Calendar.getInstance(); 
@@ -85,6 +88,7 @@ public class FicheEmprunt implements ActionListener{
 		this.dealMoney();
 		this.addUI();
 	}
+	
 
 	public void stringo()
 	{
@@ -93,6 +97,7 @@ public class FicheEmprunt implements ActionListener{
 		sqlHelper.searchsql(sqlsearch);
 		debut = sqlHelper.getString("dateemprunt");
 		fin = sqlHelper.getString("datefin");
+		bd = sqlHelper.getString("typedoc");
 		sqlsearch = "SELECT * FROM " + "LOGIN" + " where ID = '" + user.getId()+ "'";
 		sqlHelper.searchsql(sqlsearch);
 		prenom = sqlHelper.getString("username");
@@ -101,6 +106,8 @@ public class FicheEmprunt implements ActionListener{
 		titre = sqlHelper.getString("titre");
 		sqlHelper.disconnect();
 	}
+	
+	
 
 	public void addUI(){
 		frame.setMinimumSize(new Dimension(640,350));

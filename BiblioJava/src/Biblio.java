@@ -41,22 +41,14 @@ public class Biblio implements ActionListener{
 	private User user;
 	private JFrame frame;
 	private JPanel panel;
-	private JPanel panelcompte;
-	private JButton boutonCompte;
 	private JPanel panelbouton;
 	private CardLayout cl;
-	private JPanel panelcompteAdd;
 	private JButton boutonCompteAddMusique;
 	private JButton boutonCompteAddLivre;
 	private JButton boutonCompteAddVideo;
-	private JPanel panelAddmin;
 	private AddDocument add;
-	private int nbResult;
 	private ArrayList<ObjList> lobj;
 	private ObjList obj;
-	private JPanel panelFiches;
-	private JLabel labelMesFiches;
-	private JPanel panelFicheVoir;
 	private ArrayList<JButton> lButtonC;
 	private ArrayList<Integer> lIntegerC;
 	private Calendar calendar = Calendar.getInstance();
@@ -66,10 +58,15 @@ public class Biblio implements ActionListener{
 	private PanelBiblioUi panelLivre;
 	private JButton boutonBuy;
 	private CarteBleu achat;
+	private PanelBiblioUi panelUser;
+	private PanelBiblioUi panelAdmin;
+	private JPanel paneUserInfo;
+	private JLabel credit;
+	private JLabel userName;
 	
 	public Biblio () {
 		//sqlHelper.createTable();
-		//sqlHelper.fillTables();
+		sqlHelper.fillTables();
 	    connection ();
 	    lButtonC = new ArrayList<JButton>();
 	    lIntegerC = new ArrayList<Integer>();
@@ -108,118 +105,90 @@ public class Biblio implements ActionListener{
 		frame = new JFrame ("LibraryGUI");
 		frame.setMinimumSize(new Dimension(1200,800));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
 		frame.pack();
 		frame.setLayout(new BorderLayout());
 		cl = new CardLayout();
 		panelbouton = new JPanel();
-		panelbouton.setBackground(Color.gray);	
+		panelbouton.setBackground(Color.LIGHT_GRAY);	
 	    obj = new ObjList();
 	    panel = new JPanel();
 	    panel.setLayout(cl);
-	}
-	
-	private void setupCompteUI() {
-		panelcompte = new JPanel();
-		panelcompteAdd = new JPanel();
-	    panelcompte.setBackground(Color.blue);	
-	    panelcompte.setLayout(new BorderLayout());
 	    
-	    boutonCompteAddMusique = new JButton("Add Musique");
-	    boutonCompteAddMusique.addActionListener(this);
-	    boutonCompteAddLivre = new JButton("Add Livre");
-	    boutonCompteAddLivre.addActionListener(this);
-	    boutonCompteAddVideo = new JButton("Add Video");
-	    boutonCompteAddVideo.addActionListener(this);
-	    
-	    panelAddmin = new JPanel ();
-		panelAddmin.setBackground(Color.darkGray);	
-	    
-	    panelAddmin.setLayout(new BoxLayout(panelAddmin,BoxLayout.X_AXIS));
-	    panelAddmin.add(Box.createHorizontalGlue());
-	    panelAddmin.add(boutonCompteAddLivre);
-	    panelAddmin.add(Box.createHorizontalGlue());
-	    panelAddmin.add(boutonCompteAddMusique);
-	    panelAddmin.add(Box.createHorizontalGlue());
-	    panelAddmin.add(boutonCompteAddVideo);
-	    panelAddmin.add(Box.createHorizontalGlue());
-	    
-	    panelFiches = new JPanel (new GridLayout(10,1));
-	    
-	    panelFicheVoir = new JPanel();
-	    labelMesFiches = new JLabel ("Mes Fiches");
-	    labelMesFiches.setFont(new Font(labelMesFiches.getFont().getFontName(),Font.ROMAN_BASELINE,20));
-	    panelFicheVoir.add(labelMesFiches);
-	    panelFiches.add(panelFicheVoir);    
-	    
-	    boutonCompte = new JButton("Compte");
-	    boutonCompte.addActionListener(this);
-	    
-	    boutonBuy = new JButton ("Acheter des Crédit");
-	    boutonBuy.addActionListener(this);
-	    
-	    panelcompte.add(panelFiches,BorderLayout.CENTER);
-	    panelcompte.add(panelAddmin,BorderLayout.SOUTH);
-	    
+	    panelFilm = new PanelBiblioUi(obj,frame,sqlHelper,user,"Video","VIDEO");
+		panelLivre = new PanelBiblioUi(obj,frame,sqlHelper,user,"Livre","LIVRE");
+		panelMusique = new PanelBiblioUi(obj,frame,sqlHelper,user,"Musique","AUDIO");
+		panelUser = new PanelBiblioUi(obj,frame,sqlHelper,user,"Compte","FICHE");
+		panelAdmin = new PanelBiblioUi(obj,frame,sqlHelper,user,"Compte","LOGIN");
 	}
 	
 	private void finishFrameUI(){
-		panel.add(panelcompte, "compte");
+		if (user.getUsername().equals("ADMIN"))		panel.add(panelAdmin.getPanel(),"compte");
+		else 										panel.add(panelUser.getPanel(), "compte");
 	    panel.add(panelLivre.getPanel(), "livre");
 	    panel.add(panelMusique.getPanel(), "musique");
 	    panel.add(panelFilm.getPanel(), "video");
 	    
-	    panelbouton.add(boutonCompte);
+	    if (user.getUsername().equals("ADMIN"))	    panelbouton.add(panelAdmin.getBouton());
+	    else										panelbouton.add(panelUser.getBouton());
 	    panelbouton.add(panelFilm.getBouton());
 	    panelbouton.add(panelLivre.getBouton());
 	    panelbouton.add(panelMusique.getBouton());
+	    boutonBuy = new JButton ("Acheter des Crédits");
+	    boutonBuy.addActionListener(this);
 	    panelbouton.add(boutonBuy);
+	    if (user.getUsername().equals("ADMIN")) 	panelAdmin.getBouton().addActionListener(this);
+	    else										panelUser.getBouton().addActionListener(this);
 	    panelFilm.getBouton().addActionListener(this);
 	    panelLivre.getBouton().addActionListener(this);
 	    panelMusique.getBouton().addActionListener(this);
 	    
+	    if (user.getUsername().equals("ADMIN"))		panelAdmin.getBouton().setFont(new Font(panelAdmin.getBouton().getFont().getFontName(),Font.ROMAN_BASELINE,18));
+	    panelUser.getBouton().setFont(new Font(panelUser.getBouton().getFont().getFontName(),Font.ROMAN_BASELINE,18));
+	    panelFilm.getBouton().setFont(new Font(panelFilm.getBouton().getFont().getFontName(),Font.ROMAN_BASELINE,18));
+	    panelLivre.getBouton().setFont(new Font(panelLivre.getBouton().getFont().getFontName(),Font.ROMAN_BASELINE,18));
+	    panelMusique.getBouton().setFont(new Font(panelMusique.getBouton().getFont().getFontName(),Font.ROMAN_BASELINE,18));
+	    boutonBuy.setFont(new Font(boutonBuy.getFont().getFontName(),Font.ROMAN_BASELINE,18));
 	    
-	    frame.add(panelbouton, BorderLayout.NORTH);
+	    //panelUser.getBouton().getText().
+	    
+	    paneUserInfo = new JPanel();
+	    paneUserInfo.setBackground(Color.LIGHT_GRAY); 
+	    paneUserInfo.setLayout(new BorderLayout());
+	    credit = new JLabel("Crédits : " + Integer.toString(user.getCredit())+"   ");
+	    userName = new JLabel("   Nom d'utilisateur : " + user.getUsername().toUpperCase());
+	    userName.setFont(new Font(userName.getFont().getFontName(),Font.ROMAN_BASELINE,24));
+	    paneUserInfo.add(userName, BorderLayout.WEST);
+	    paneUserInfo.add(panelbouton, BorderLayout.CENTER);
+	    credit = new JLabel("Crédits : " + Integer.toString(user.getCredit())+"   ");
+	    credit.setFont(new Font(credit.getFont().getFontName(),Font.ROMAN_BASELINE,24));
+	    paneUserInfo.add(credit, BorderLayout.EAST);
+	    frame.add(paneUserInfo, BorderLayout.NORTH);
 	    frame.add(panel, BorderLayout.CENTER);
 		frame.setVisible(true);
 	}
 	 
 	public void afficheLibrairy (){
 		setupFrameUI();
-		panelFilm = new PanelBiblioUi(obj,frame,sqlHelper,user,"Video","VIDEO");
-		panelLivre = new PanelBiblioUi(obj,frame,sqlHelper,user,"Livre","LIVRE");
-		panelMusique = new PanelBiblioUi(obj,frame,sqlHelper,user,"Musique","AUDIO");
-		setupCompteUI();
+		
+		//setupCompteUI();
 		finishFrameUI();
 		new UpdateDataBase();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if (arg0.getSource() == boutonCompte){
-			cl.show(panel, "compte");
-	        nbResult = 0;
-	        clearSearch(panelFiches,panelFicheVoir);
-	        lButtonC.clear();
-	        lIntegerC.clear();
-	        String sqlsearch = "SELECT * FROM FICHE where userid="+user.getId();
-	        sqlHelper.connect();
-			sqlHelper.searchsql(sqlsearch);
-	        for (ObjList o : lobj) o.setCancel(true); 
-			lobj.clear();
-		    while ( sqlHelper.getNext() && nbResult <8) {
-		    	obj = new ObjList(sqlHelper.getString("docId"),sqlHelper.getString("typedoc"),sqlHelper.getString("dateemprunt"),sqlHelper.getString("datefin"),frame.getWidth()-100,panelFiches);
-		    	obj.Sstart(sqlHelper.getString("datefin"));
-		    	lButtonC.add(obj.getButtonVP());
-		    	lIntegerC.add(sqlHelper.getInt("id"));
-		    	obj.getButtonVP().addActionListener(this);
-		    	nbResult++;
-		    	lobj.add(obj);
+		if (user.getUsername().equals("ADMIN"))	{
+			if (arg0.getSource() == panelAdmin.getBouton()){
+				cl.show(panel, "compte");
 			}
-		    sqlHelper.disconnect();
-			panelFiches.updateUI();
-			obj.updateTitre(lobj);
 		}
-		else if (arg0.getSource() == panelMusique.getBouton()){
+		else {
+			if (arg0.getSource() == panelUser.getBouton()){
+				cl.show(panel, "compte");
+			} 
+		}
+		if (arg0.getSource() == panelMusique.getBouton()){
 			cl.show(panel, "musique");
 		}
 		else if (arg0.getSource() == panelLivre.getBouton()){
@@ -241,6 +210,11 @@ public class Biblio implements ActionListener{
 		else if (arg0.getSource() == boutonBuy){
 			achat = new CarteBleu(user,sqlHelper);
 		}
+		sqlHelper.connect();
+		String sqls = "SELECT * FROM " + "LOGIN" + " where ID = '" + user.getId() + "'";
+		sqlHelper.searchsql(sqls);
+		credit.setText("Crédits : " + sqlHelper.getString("credit")+"   ");
+		sqlHelper.disconnect();
 	}
 	
 	public void clearSearch (JPanel paneR, JPanel paneAdd){

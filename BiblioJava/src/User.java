@@ -11,7 +11,7 @@ public class User {
 	
 	public void buyCredit (int credit, SqlHelper sqlHelper) {
 		sqlHelper.connect();
-		String addCredit = "UPDATE FROM LOGIN SET CREDIT ="+ (this.getCredit() + credit) +" WHERE id ="+ getId();
+		String addCredit = "UPDATE LOGIN SET CREDIT ="+ (this.getCredit() + credit) +" WHERE id ="+ getId();
 		sqlHelper.updatesql(addCredit);
 		sqlHelper.disconnect();
 	}

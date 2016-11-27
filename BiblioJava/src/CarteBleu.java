@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,7 +45,7 @@ public class CarteBleu implements ActionListener{
 	private JLabel lVisa = new JLabel ();
 	private JLabel lExpiration = new JLabel("Date d'expiration");
 	private JFormattedTextField fCarte = new JFormattedTextField();
-	private JTextField fSecure = new JTextField();
+	private JFormattedTextField fSecure = new JFormattedTextField(NumberFormat.getNumberInstance());
 	private GridBagConstraints c = new GridBagConstraints();
 	private JButton bOk = new JButton("Valider");
 	private JButton bAnnuler = new JButton("Annuler");
