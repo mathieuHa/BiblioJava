@@ -384,6 +384,7 @@ public class AddJson {
 			System.out.println("ERRRRRRRRRREURR");
 			erreur = false;}
 		else{
+			System.out.println("debut");
 			JSONObject js = this.getObjectJS();
 			if (js != null){
 				JSONObject track = js.optJSONObject("tracks");
@@ -391,6 +392,7 @@ public class AddJson {
 					JSONArray Array = track.optJSONArray("items");
 					if (Array != null){
 						for (int i=0; i<Array.length(); i++){
+							System.out.println("Item");
 							JSONObject item = Array.optJSONObject(i);
 							if (item != null) {
 								id = String.valueOf(item.optString("id")); if (id == null) id=inconnu;
@@ -416,6 +418,7 @@ public class AddJson {
 									}
 									
 								}
+								System.out.println("ajout");
 								sendMusic(title,auteur,album,image,id);
 							}
 						}

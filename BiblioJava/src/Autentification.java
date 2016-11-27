@@ -1,6 +1,8 @@
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -32,13 +34,14 @@ public class Autentification implements ActionListener {
 	private JLabel textpassword;
 	private JButton boutonconnexion;
 	private JButton boutoninscription;
-	private JPanel panelpaswd;
+	private JPanel pane;
 	private ImagePanel panelname;
 	private Statement stmt = null;
 	private User user;
 	private Boolean ok = false;
 	private JPanel paneltxt;
 	private Border line;
+	private JLabel lTitre;
 	
 
 	public Autentification () {
@@ -50,6 +53,13 @@ public class Autentification implements ActionListener {
 		frame.setMinimumSize(new Dimension(640,350));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
+		
+		pane = new JPanel();
+		pane.setBackground(Color.GRAY);
+		lTitre = new JLabel("Bienvenu dans notre Bibliotheque");
+		pane.add(lTitre);
+		lTitre.setFont(new Font(lTitre.getFont().getFontName(),lTitre.getFont().getStyle(),20));
+		frame.add(pane,BorderLayout.NORTH);
 		
 		textlogin = new JLabel    ("username       :");
 		textlogin.setOpaque(true);

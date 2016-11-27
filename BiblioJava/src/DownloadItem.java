@@ -24,7 +24,7 @@ public class DownloadItem {
 				// TODO Auto-generated method stub
 				ad.getSqlHelper().connect();
 				for (int i = 1; i<10; i++){
-					for (int j = 1; j<1000; j++)
+					//for (int j = 1; j<1000; j++)
 						s = scanner.nextLine();
 					ad.addVideo(i);
 					ad.addBook(s);
